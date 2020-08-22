@@ -26,7 +26,7 @@
 
 最初に高機能なテキストエディタ（サクラエディタ、秀丸、VS Code など）をダウンロード＆インストールしないといけない。この本ではサクラエディタの使用を推奨する。
 
-サクラエディタ [https://sakura-editor.github.io/download.html](https://sakura-editor.github.io/download.html)
+- サクラエディタ [https://sakura-editor.github.io/download.html](https://sakura-editor.github.io/download.html)
 
 テキストエディタを起動して文字を書いて保存する。保存するには、右上の「ファイル」メニューから「上書き保存」を選ぶ。保存したい場所を選んで「保存」。これでテキストファイルが作成できる。
 
@@ -249,11 +249,11 @@ int main(void)
     if (MessageBoxA(NULL, "Yes or No?", "Test",
                     MB_ICONINFORMATION | MB_YESNO) == IDYES)
     {
-        printf("You choosed YES\n");
+        printf("You chose YES\n");
     }
     else
     {
-        printf("You choosed NO\n");
+        printf("You chose NO\n");
     }
 }
 ```
@@ -263,7 +263,7 @@ g++ hello2.cpp -o hello2
 hello2
 ```
 
-これを実行すると、黒い画面の上にメッセージボックスが表示され「はい」か「いいえ」の選択を促される。「はい」を選択すると`"You choosed YES"`と表示される。「いいえ」を選択すると`"You choosed NO"`と表示される。`MessageBoxA`はメッセージボックスを表示するWin32 API関数`MessageBox`のANSI版であり、これを使うために事前に`#include <windows.h>`が必要になる。
+これを実行すると、黒い画面の上にメッセージボックスが表示され「はい」か「いいえ」の選択を促される。「はい」を選択すると`"You chose YES"`と表示される。「いいえ」を選択すると`"You chose NO"`と表示される。`MessageBoxA`はメッセージボックスを表示するWin32 API関数`MessageBox`のANSI版であり、これを使うために事前に`#include <windows.h>`が必要になる。
 
 ![hello2の実行イメージ](images/messagebox.png)
 
