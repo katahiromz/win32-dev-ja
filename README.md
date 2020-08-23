@@ -2162,7 +2162,7 @@ WinMain(HINSTANCE   hInstance,
 }
 ```
 
-ここまでのリソース（notepad_res.rc）は次の通り。
+ここまでのリソース（`notepad_res.rc`）は次の通り。
 
 ```rc
 // notepad_res.rc
