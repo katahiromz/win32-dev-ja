@@ -2728,3 +2728,9 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
 target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 ```
+
+## 結び
+
+ここまでC++/Win32のプログラミングについて解説した。少しずつ修正・改良するという手法なら、くじけず開発を続けることができる。GitHubやインターネットにはもっと多くの情報が掲載されている。研究を続け、どんどん工夫していけば、高度なアプリも作れるようになれるだろう。
+
+この文書では解説できなかったが、GitとGitHubの使い方やReactOSの開発についてもどこかで紹介したいと考えている。
