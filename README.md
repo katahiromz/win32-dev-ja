@@ -2,7 +2,7 @@
 
 ## 片山博文MZ（かたやまひろふみエムゼッド）
 
-![蟻さん](images/ant.png)
+![蟻さん](images/ant.png)\
 
 # はじめに
 
@@ -44,8 +44,8 @@
 
 以下の２つの文字列を比較してほしい：
 
-- `ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９＃！＠`
-- `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#!@`
+- `ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ`
+- `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
 
 前者が全角（ぜんかく）文字で、後者が半角（はんかく）文字である。昔のパソコンでは全角文字は半角文字の二倍の幅を持っていた。半角文字の多くは英語のASCII文字と互換性があり、英語圏でも同じデータでやり取りできるが、全角文字を日本語ではないパソコンで表示しようとすると問題が発生することがある。
 
@@ -149,17 +149,17 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 ダウンロードに成功したらインストールしよう。ファイルアイコンをダブルクリックすれば、インストールが始まる。
 
-![RosBE サイト](images/rosbe-site.png)
+![RosBE サイト](images/rosbe-site.png)\
 
 ## RosBEの起動
 
 インストールに成功したら、デスクトップにRosBEのアイコンが出来ているはずである。ダブルクリックしてRosBEを起動しよう。
 
-![RosBE アイコン](images/rosbe-icon.png)
+![RosBE アイコン](images/rosbe-icon.png)\
 
 起動すると次のようなRosBEのコマンドプロンプトが表示される。
 
-![RosBE コマンドプロンプト](images/rosbe-cmd.png)
+![RosBE コマンドプロンプト](images/rosbe-cmd.png)\
 
 著者のユーザ名は`katahiromz`なので、読者の環境ではいくつか表示が異なるかもしれない。
 
@@ -173,13 +173,13 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 `CD`コマンドはディレクトリ（フォルダの位置）を移動するコマンドである。
 
-![CDコマンドの実行例](images/rosbe-cmd-cd.png)
+![CDコマンドの実行例](images/rosbe-cmd-cd.png)\
 
 `cd ..`で一つ上のフォルダに移動できる。`cd (フォルダパス)`で現在のディレクトリを移動できる。相対パスと絶対パスのいずれかを指定できる。
 
 試しに、マイドキュメントに移動してみよう。マイドキュメントの位置（例えば、筆者の環境では`C:\User\katahiromz\Documents`）を確認して、CDコマンドで指定すると移動できる。
 
-![CDコマンドの実行例2](images/rosbe-cmd-cd2.png)
+![CDコマンドの実行例2](images/rosbe-cmd-cd2.png)\
 
 ## `DIR`コマンド
 
@@ -205,7 +205,7 @@ dir
 
 このようにコマンドを入力すると以下のような表示になる。
 
-![MDコマンドの実行例](images/rosbe-cmd-ex1.png)
+![MDコマンドの実行例](images/rosbe-cmd-ex1.png)\
 
 ## `START .`コマンド
 
@@ -217,7 +217,7 @@ dir
 
 C/C++では、ソースファイル（拡張子`.c`/`.cpp`）をC++コンパイラでコンパイルしてできたオブジェクトファイル（拡張子`.o`/`.obj`）をライブラリ（`lib*.a`/`*.lib`）とリンクすると、EXEファイルやDLLファイルができる。コンパイルとリンクを合わせてEXEファイルやDLLファイルなどを作ることを構築（ビルド; build）という。ビルドのイメージは次のようになる。
 
-![ビルドのイメージ](images/build-image.png)
+![ビルドのイメージ](images/build-image.png)\
 
 それでは、実際にソースファイルを作成しよう。`C:\dev\cxx`に次のような内容の`hello.cpp`というテキストファイルを作成して下さい。
 
@@ -251,7 +251,7 @@ hello
 
 エラーメッセージが表示されたら、何か文字を間違えているかもしれません。`hello.cpp`の内容を注意深く確認して下さい。
 
-![RosBEでC++コンパイル](images/rosbe-build-cpp.png)
+![RosBEでC++コンパイル](images/rosbe-build-cpp.png)\
 
 無事にコンパイルが終了すると、EXEファイル`C:\dev\cxx\hello.exe`が作成され、`hello.exe`が実行可能になる。`hello`と入力すると、同じフォルダにある`hello.exe`が実行され、`Hello, world`と表示される。
 
@@ -287,7 +287,7 @@ hello2
 
 これを実行すると、黒い画面の上にメッセージボックスが表示され「はい」か「いいえ」の選択を促される。「はい」を選択すると`"You chose YES"`と表示されてアプリが終了する。「いいえ」を選択すると`"You chose NO"`と表示される。`MessageBoxA`はメッセージボックスを表示するWin32 API関数`MessageBox`のANSI版であり、これを使うために事前に`#include <windows.h>`が必要になる。
 
-![hello2の実行イメージ](images/messagebox.png)
+![hello2の実行イメージ](images/messagebox.png)\
 
 コマンドプロンプトから`hello2.exe`を実行できるし、`hello2.exe`をダブルクリックしても実行可能である。
 
@@ -326,7 +326,7 @@ ninja
 
 実行結果は次の通り。
 
-![CMake/Ninjaによるビルド](images/ninja.png)
+![CMake/Ninjaによるビルド](images/ninja.png)\
 
 ビルドの際にEXE以外にさまざまなファイルが作成されるが、無視してもよい。
 
@@ -342,7 +342,7 @@ ninja
 
 リソーエディタをインストールすれば、次のようなアイコンがデスクトップに作成される。
 
-![リソーエディタ](images/RisohEditor.png)
+![リソーエディタ](images/RisohEditor.png)\
 
 リソーエディタの詳しい使い方については、次のまとめサイトを参照されたい。
 
@@ -456,13 +456,13 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 さらに、`cmake -G "Ninja" .`と`ninja`を実行すれば、`dialog.exe`がビルドされる。
 
-![dialogのビルド](images/dialog-build.png)
+![dialogのビルド](images/dialog-build.png)\
 
 一行ずつ解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
 
 それでは`dialog.exe`を実行してみよう。次のような何の変哲もないダイアログが開かれるはずである。
 
-![dialog.exeのイメージ](images/dialog.png)
+![dialog.exeのイメージ](images/dialog.png)\
 
 「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。`EndDialog`がなければ終了しないダイアログアプリになる。
 
@@ -509,7 +509,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 5. 「OK」ボタンを押すと、`RT_GROUP_ICON`と`RT_ICON`が追加される。
 6. 上書き保存する。
 
-![アイコンを追加](images/add-icon.png)
+![アイコンを追加](images/add-icon.png)\
 
 さらにダイアログでこのアイコンを使うように`WM_INITDIALOG`のプロシージャを変更しよう。
 
@@ -554,7 +554,7 @@ WinMain(HINSTANCE   hInstance,
 
 では、再び`ninja`を実行してビルドしよう。EXEファイルのアイコンが変更され、実行するとアイコン付きのダイアログになる。
 
-![アイコンを追加したダイアログ](images/icon-added-dialog.png)
+![アイコンを追加したダイアログ](images/icon-added-dialog.png)\
 
 ここまでのソース`dialog.cpp`は以下の通り。
 
@@ -669,33 +669,33 @@ FONT 9, "MS UI Gothic"
 
 リソーエディタで`dialog_res.rc`を開く。`RT_DIALOG`→`1`→`日本語`を選択し、ダブルクリックする。「ダイアログの編集」が開かれる。
 
-![ダイアログの編集](images/dialog-edit.png)
+![ダイアログの編集](images/dialog-edit.png)\
 
 ラベルを追加する。右クリックして「コントロールの追加」を選ぶ。
 
-![ラベルの追加](images/ltext.png)
+![ラベルの追加](images/ltext.png)\
 
 「定義済みControl:」に`LTEXT`と入力する。「キャプション:」に「整数:」と入力する。「ID:」に「`stc1`」と入力する。「OK」ボタンを押す。
 
 ラベル「整数:」が追加されるのでサイズと位置を調整する。
 
-![ラベルの追加2](images/label-added.png)
+![ラベルの追加2](images/label-added.png)\
 
 次にテキストボックスを追加する。右クリックして「コントロールの追加」を選ぶ。
 
-![テキストボックスの追加](images/edittext.png)
+![テキストボックスの追加](images/edittext.png)\
 
 「定義済みControl:」に「`EDITTEXT`」と入力し、「ID:」に「`edt1`」と入力する。「OK」ボタンを押す。
 
 ボタンが追加される。位置とサイズを調整する。
 
-![テキストボックスの追加2](images/textbox-added.png)
+![テキストボックスの追加2](images/textbox-added.png)\
 
 「ダイアログの編集」を閉じ、変更内容を上書き保存する。
 
 これでラベル（`LTEXT`）とテキストボックス（`EDITTEXT`）を追加できた。`ninja`を再び実行してビルドしよう。
 
-![追加に成功](images/controls-added.png)
+![追加に成功](images/controls-added.png)\
 
 ２個のコントロールが追加されている。リソースファイル`dialog_res.rc`は次のようになる。
 
@@ -771,7 +771,7 @@ void OnOK(HWND hwnd)
 
 では`ninja`を実行して再びビルドして`dialog.exe`を実行しよう。
 
-![実行結果](images/nibai.png)
+![実行結果](images/nibai.png)\
 
 テキストボックスに「1111」と入力して「OK」ボタンをクリックすればメッセージボックスで「2222」と返ってくる。その後、メッセージボックスを閉じると、ダイアログは自動的に閉じられる。
 
@@ -886,9 +886,17 @@ FONT 9, "MS UI Gothic"
 
 ダイアログを開いて`Tab`キーを何度か押してみよう。
 
-![フォーカス1](images/focus-1.png)
-![フォーカス2](images/focus-2.png)
-![フォーカス3](images/focus-3.png)
+初めの状態。
+
+![フォーカス1](images/focus-1.png)\
+
+1回`Tab`キーを押す。
+
+![フォーカス2](images/focus-2.png)\
+
+2回目。
+
+![フォーカス3](images/focus-3.png)\
 
 見ればわかるように、`Tab`キーは「キーボード フォーカス」というものを移動させる。フォーカスというのは、現在のキーボード操作対象のコントロールのことである。最初は「OK」ボタンにフォーカスがある。次は「キャンセル」ボタンにフォーカスが移る。最後にテキストボックスにフォーカスが移る。もう一度`Tab`キーを押すと「OK」ボタンに戻る。
 
@@ -909,7 +917,7 @@ FONT 9, "MS UI Gothic"
 
 これで`WM_INITDIALOG`メッセージで`TRUE`を返すと、自動的にedt1にフォーカスが当たるようになる。`ninja`を実行してもう一度試してみよう。
 
-![フォーカス4](images/focus-4.png)
+![フォーカス4](images/focus-4.png)\
 
 今度は、最初に`edt1`にフォーカスが当たる。これでダイアログを開いたらすぐに整数を入力できる。
 
@@ -998,7 +1006,7 @@ void OnOK(HWND hwnd)
 
 文字列テーブルには日本語バージョン以外に英語やフランス語バージョンなどを追加できるので、これで国際化ができるようになった。
 
-![文字列テーブルで国際化](images/localize.png)
+![文字列テーブルで国際化](images/localize.png)\
 
 ソース（`dialog.cpp`）は次の通りである。
 
