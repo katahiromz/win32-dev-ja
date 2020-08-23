@@ -119,7 +119,7 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 パソコン（PC）の OS は64ビット版のWindows 10で決まり。記憶媒体には、ハードディスク（HDD）は遅いので SSD の 200GB 以上を選択する。メインメモリは4GB以上を選択する。
 
-ノートパソコンとデスクトップパソコンの2種類あるが、デスクトップの方が安い。オフィスソフトは必要になったときに買えばいい。LibreOfficeという無料のオフィス互換ソフトもある。これでだいたい6万円くらいになる。中古を選べば5万円くらいで購入できるが、品質が保証されないので注意。
+ノートパソコンとデスクトップパソコンの2種類あるが、デスクトップの方が安い。オフィスソフトは必要になったときに買えばいい。LibreOfficeという無料のオフィス互換ソフトもある。これで全部でだいたい6万円くらいになる。中古を選べば5万円くらいで購入できるが、品質が保証されないので注意。
 
 ## リファレンスは便利
 
@@ -259,7 +259,7 @@ hello
 
 ## 初めてのWin32プログラム（hello2.cpp）
 
-次はWin32プログラムを作ってみよう。次のような内容の`hello2.cpp`を作って下さい。
+次はWin32プログラム（アプリ）を作ってみよう。次のような内容の`hello2.cpp`を作って下さい。
 
 ```cpp
 #include <windows.h>
@@ -283,7 +283,7 @@ g++ hello2.cpp -o hello2
 hello2
 ```
 
-これを実行すると、黒い画面の上にメッセージボックスが表示され「はい」か「いいえ」の選択を促される。「はい」を選択すると`"You chose YES"`と表示される。「いいえ」を選択すると`"You chose NO"`と表示される。`MessageBoxA`はメッセージボックスを表示するWin32 API関数`MessageBox`のANSI版であり、これを使うために事前に`#include <windows.h>`が必要になる。
+これを実行すると、黒い画面の上にメッセージボックスが表示され「はい」か「いいえ」の選択を促される。「はい」を選択すると`"You chose YES"`と表示されてアプリが終了する。「いいえ」を選択すると`"You chose NO"`と表示される。`MessageBoxA`はメッセージボックスを表示するWin32 API関数`MessageBox`のANSI版であり、これを使うために事前に`#include <windows.h>`が必要になる。
 
 ![hello2の実行イメージ](images/messagebox.png)
 
@@ -395,9 +395,9 @@ WinMain(HINSTANCE   hInstance,
 急にプログラムがややこしくなったが、１つ１つ理解していけば問題ない。
 `#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。ダイアログプロシージャは典型的なイベント駆動型プログラミングを実装する。`WM_INITDIALOG`メッセージはダイアログの初期化のときに発生する。`WM_COMMAND`メッセージはダイアログでコマンドが発生したとき（ボタンが押されたときなど）に発生する。
 
-ここでは、main関数の代わりに`WinMain`という関数を使う。main関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不必要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。
+ここでは、main関数の代わりに`WinMain`という関数を使う。main関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不必要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。`MAKEINTRESOURCE`マクロは、整数のリソース名を指定するのに使う。
 
-開発が進むにつれて、複雑なコードを何度も入力するはめになるが、`WinMain`や`DialogProc`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。入力補助として`MsgCrack`というソフトがあるので活用されたい。
+開発が進むにつれて、複雑なコードを何度も入力するはめになるが、`WinMain`や`DialogProc`、`OnInitDialog`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。入力補助として`MsgCrack`というソフトがあるので活用されたい。
 
 - MsgCrack [https://katahiromz.web.fc2.com/msgcrack/ja/](https://katahiromz.web.fc2.com/msgcrack/ja/)
 
@@ -456,13 +456,13 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 ![dialogのビルド](images/dialog-build.png)
 
-解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
+一行ずつ解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
 
-それでは`dialog.exe`を実行してみよう。次のようなダイアログが開かれるはずである。
+それでは`dialog.exe`を実行してみよう。次のような何の変哲もないダイアログが開かれるはずである。
 
 ![dialog.exeのイメージ](images/dialog.png)
 
-「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。
+「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。`EndDialog`がなければ終了しないダイアログアプリになる。
 
 ## 「OK」ボタンの処理を追加する
 
@@ -683,7 +683,7 @@ FONT 9, "MS UI Gothic"
 
 ![テキストボックスの追加](images/edittext.png)
 
-「定義済みControl:」に「EDITTEXT」と入力し、「ID:」に「edt1」と入力する。「OK」ボタンを押す。
+「定義済みControl:」に「`EDITTEXT`」と入力し、「ID:」に「`edt1`」と入力する。「OK」ボタンを押す。
 
 ボタンが追加される。位置とサイズを調整する。
 
@@ -765,7 +765,7 @@ void OnOK(HWND hwnd)
 }
 ```
 
-テキストボックスに入力された整数を取得するには、`GetDlgItemInt`というAPI 関数が用意されているのでこれを使う。`wsprintfW`はC言語の`sprint`に似た関数だが、Unicodeに対応しているところと浮動小数点数に対応していないところが違う。C言語の文字列リテラルの最初に`L`が付いていると、Unicode文字列になる。よって`L"%d"`は、Unicode文字列リテラルである。`MessageBoxW`関数はメッセージボックスを表示してボタンが押されるまで待つ関数`MessageBox`のUnicode版である。
+テキストボックスに入力された整数を取得するには、`GetDlgItemInt`というAPI 関数が用意されているのでこれを使う。`wsprintfW`はC言語の`sprintf`に似た関数だが、Unicodeに対応しているところと浮動小数点数に対応していないところが違う。C言語の文字列リテラルの最初に`L`が付いていると、Unicode文字列になる。よって`L"%d"`は、Unicode文字列リテラルである。`MessageBoxW`関数はメッセージボックスを表示してボタンが押されるまで待つ関数`MessageBox`のUnicode版である。
 
 では`ninja`を実行して再びビルドして`dialog.exe`を実行しよう。
 
@@ -890,7 +890,7 @@ FONT 9, "MS UI Gothic"
 
 見ればわかるように、`Tab`キーは「キーボード フォーカス」というものを移動させる。フォーカスというのは、現在のキーボード操作対象のコントロールのことである。最初は「OK」ボタンにフォーカスがある。次は「キャンセル」ボタンにフォーカスが移る。最後にテキストボックスにフォーカスが移る。もう一度`Tab`キーを押すと「OK」ボタンに戻る。
 
-テキストボックスはフォーカスがないと入力できない。最初にテキストボックスにフォーカスがある方がユーザーにとって親切だろう。そこで、コントロールの順序を次のように変えて、上書き保存する。
+テキストボックスはフォーカスがないと入力できない。最初にテキストボックスにフォーカスがある方がユーザーにとって親切だろう。そこで、`dialog_res.rc`をテキストエディタで開いてコントロールの順序を次のように変えて、上書き保存する。
 
 ```rc
 1 DIALOG 0, 0, 215, 135
@@ -938,11 +938,11 @@ FONT 9, "MS UI Gothic"
     MessageBoxW(hwnd, szText, L"Nibai", MB_ICONINFORMATION);
 ```
 
-に`L"Nibai"というテキストがあるが、これを日本語化したい。しかしソースコードに直接日本語の`L"二倍"`と書くのは、互換性がない。
+に`L"Nibai"`というテキストがあるが、これを日本語化したい。しかしソースコードに直接日本語の`L"二倍"`と書くのは、ソースコード互換性がない。
 
 そこでリソースの「文字列テーブル」というものを使う。
 
-1. `dialog_res.rc`をリソーエディタで開く。
+1. リソーエディタで`dialog_res.rc`を開く。
 2. 「編集」メニューの「追加」→「文字列テーブルを追加」を選ぶ。
 3. 「OK」ボタンを押す。文字列テーブル「`RT_STRING`」→「日本語」が追加される。
 4. 次のように編集する。
@@ -1104,7 +1104,7 @@ CAPTION "サンプル ダイアログ"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "MS UI Gothic"
 {
-    LTEXT "整数:", -1, 17, 17, 29, 14
+    LTEXT "整数:", stc1, 17, 17, 29, 14
     EDITTEXT edt1, 57, 17, 60, 14, ES_NUMBER
     DEFPUSHBUTTON "OK", IDOK, 35, 115, 60, 14
     PUSHBUTTON "キャンセル", IDCANCEL, 115, 115, 60, 14
