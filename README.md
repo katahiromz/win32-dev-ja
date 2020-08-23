@@ -4,13 +4,13 @@
 
 ![蟻さん](images/ant.png)\
 
-# はじめに
+## はじめに
 
-## この文書について
+### この文書について
 
 スマホに親しんだ若者がWindows 10で現代的な C++/Win32 のプログラムを作る場合に役立てばいいなと思って作りました。
 
-## 基本精神
+### 基本精神
 
 文字がわからなければ、親か先生に「あいうえお」と「アルファベット」を教えてもらって下さい。
 
@@ -24,7 +24,7 @@
 
 調べても調べてもわからなかったらひとまず、ほっといて先読みしてみる。
 
-## テキストファイルの作り方
+### テキストファイルの作り方
 
 最初に高機能なテキストエディタ（サクラエディタ、秀丸、VS Code など）をダウンロード＆インストールしないといけない。この本ではサクラエディタの使用を推奨する。
 
@@ -36,15 +36,15 @@
 
 サクラエディタが嫌いであれば、Visual Studio Code (VS Code) などを使用してもよい。
 
-## 日本語入力
+### 日本語入力
 
 キーボードの左上の「半角／全角」キーを押すと、日本語入力モードに入ったり出ることができる。日本語入力モードで適当に入力して「変換」キーを押して漢字交じりに変換、Enterキーで確定を繰り返すと日本語が入力できる。
 
-## 大文字と小文字について
+### 大文字と小文字について
 
-アルファベットでは、`ABCDEF...`が大文字で、`abcdef...`が小文字である。
+英語のアルファベットでは、`ABCDEF...`が大文字で、`abcdef...`が小文字である。
 
-## 全角文字と半角文字について
+### 全角文字と半角文字について
 
 以下の２つの文字列を比較してほしい：
 
@@ -55,7 +55,7 @@
 
 プログラミングでは主に半角文字を使う。
 
-## ファイル名
+### ファイル名
 
 プログラミングで使うファイルや識別子の名前は、基本的に日本語や全角文字は使えないと考えた方がいいだろう。ファイル名には使えない特殊な文字がいくつかある。
 
@@ -63,7 +63,7 @@
 
 Windowsではファイル名には大文字小文字の区別がないが、他のシステムでも使うファイルについては大文字小文字を意識する必要がある。
 
-## 拡張子
+### ファイルと拡張子
 
 ファイル名の最後に「.txt」「.png」などのドット（dot）で始まる文字列が付いているのが拡張子。拡張子は、ファイルの種類を表している。
 
@@ -73,13 +73,13 @@ Windowsではファイル名には大文字小文字の区別がないが、他�
 
 拡張子が見えなければ、Windowsで拡張子が見える設定にしないといけない。開発現場では拡張子表示は必須。
 
-## フォルダとは
+### フォルダとは
 
 フォルダとは、ファイルを入れる入れ物であり、エクスプローラやデスクトップを右クリックして出てくる「新規作成」メニューの「フォルダー」を選べば作成できる。さらにフォルダの中に別のフォルダや複数のファイルを入れることができる。ファイルをまとめたり、分類するときに便利だ。
 
 例えば、Windows 10 には、`C:`ドライブに`Windows`というフォルダ（`C:\Windows`）があり、この中にWindowsのシステムファイルが含まれている。さらにこの中に`system32`フォルダ（`C:\Windows\system32`）がある。
 
-## フォルダのパスとは
+### フォルダのパスとは
 
 この`C:\Windows`や`C:\Windows\system32`というのが、フォルダのパス（path）と呼ばれる文字列で、フォルダの位置を表す。passwordとまぎらわしいので、混同しないように。`\`（バックスラッシュ）は、パスの区切りと呼ばれる。パスの区切りは環境によって異なり、Windowsでは`\`であり、Bashでは`/`（スラッシュ）である。
 
@@ -91,47 +91,47 @@ Windowsではファイル名には大文字小文字の区別がないが、他�
 
 `C:\Windows\system32`は絶対パスで、`..\system32`は相対パスである。
 
-## 検索機能
+### 検索機能
 
-### Ctrl+F
+#### Ctrl+F
 
 テキストデータの中から素早く文字列を探すには、検索機能を使う。サクラエディタでは、`Ctrl+F`キー（`Ctrl`キーを押しながら`F`キー）で検索を開始できる。
 
-### Grep
+#### Grep
 
 複数のテキストファイルからある文字列を探すには、サクラエディタで`grep`（グレップ）機能を使う（「検索」メニュー→「Grep...」）。
 
-## ファイルのロックについて
+### ファイルのロックについて
 
 Windowsでは、アプリでファイルを開くと、アプリはそのファイルが変更されないようにロックすることができる。ロックされたファイルは開いたり、変更できない。ファイルが開けない場合は、すでに開いているプログラムがないか確認しよう。
 
-## プログラムとプロセスについて
+### プログラムとプロセスについて
 
-### EXEファイルとDLLファイル
+#### EXEファイルとDLLファイル
 
 Windowsのプログラムのほとんどは、`.exe`という拡張子を持ったEXEファイルで出来ている。EXEファイルをダブルクリックするとプログラムを起動できるかもしれない。`.exe`の実行に必要な`DLL`ファイル（拡張子`.dll`）が足りないと、実行に失敗する。DLLとはdynamic linked libraryの略で、EXEの機能を拡張するために、実行の際に読み込まれる外部ライブラリのことである。ライブラリ（library）というのは、C言語などで使用できる関数をまとめたものである。
 
-### プロセス
+#### プロセス
 
 Windowsで実行したプログラムは、「プロセス」という単位で実行される。プロセスはタスクバーを右クリックすれば出てくる「タスクマネージャ」から操作できる。1個のEXEファイルから複数のプロセスを同時に起動できる。
 
-### 実行中のロック
+#### 実行中のロック
 
 プロセスは、使用しているEXEファイルとDLLファイルをロックする。そのため、実行中はEXEファイルを変更できないので、ビルドの前にそのプログラムを終了させる必要がある。終了できない場合はタスクマネージャからプロセスを強制終了しよう。
 
-# 開発環境の整備
+## 開発環境の整備
 
-## どんなパソコンが必要か
+### どんなパソコンが必要か
 
 パソコン（PC）の OS は64ビット版のWindows 10で決まり。記憶媒体には、ハードディスク（HDD）は遅いので SSD の 200GB 以上を選択する。メインメモリは4GB以上を選択する。
 
 ノートパソコンとデスクトップパソコンの2種類あるが、デスクトップの方が安い。オフィスソフトは必要になったときに買えばいい。LibreOfficeという無料のオフィス互換ソフトもある。これで全部でだいたい6万円くらいになる。中古を選べば5万円くらいで購入できるが、品質が保証されないので注意。
 
-## リファレンスは便利
+### リファレンスは便利
 
 開発を進めるとき、「リファレンス マニュアル」というものがあれば、関数の使い方をすぐ確認できて便利だし、時間の節約になる。C/C++のマニュアルや「Win32 Programmer's Reference」などをパソコンに入れて使うとよい。
 
-## どんな開発環境を使うか
+### どんな開発環境を使うか
 
 通常、WindowsでC/C++コンパイラを使いたい場合、Visual Studio か MSYS2 を使うといい。Visual Studio（以下VS）はパワフルな統合開発環境（IDE）で非常に使いやすい。MSYS2はCUIベースの開発環境で、低スペックのPCでも使える。MSYS2は最小限のWindows開発環境「MinGW」にLinuxライクなBashシェルを追加したようなもので、ちょびっとLinux風に使える開発環境だ。
 
@@ -141,11 +141,11 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 - 標準でC/C++/Win32コンパイラがある
 - ビルドしたアプリはそのままWindows XPで実行できる
-- ビルド支援のCMakeがついてくる
+- ビルド支援のCMake/Ninjaがついてくる
 
 という利点がある。
 
-## RosBEのインストール
+### RosBEのインストール
 
 では早速、Windows版のReactOS Build Environment (RosBE) をインストールしてみよう。次のリンクからWindows版のRosBEを選択すれば、ダウンロードできる。
 
@@ -155,7 +155,7 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 ![RosBE サイト](images/rosbe-site.png)\
 
-## RosBEの起動
+### RosBEの起動
 
 インストールに成功したら、デスクトップにRosBEのアイコンが出来ているはずである。ダブルクリックしてRosBEを起動しよう。
 
@@ -185,15 +185,19 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 ![CDコマンドの実行例2](images/rosbe-cmd-cd2.png)\
 
-## `DIR`コマンド
+### `DIR`コマンド
 
 `DIR`コマンドで現在のフォルダにあるファイルやフォルダの一覧を見ることができる。`CD`コマンドで`C:\Windows\system32`に移動して`dir`を実行してみよう。
 
-## コマンドを中断するには
+### コマンドを中断するには
 
 `C:\Windows\system32`には、大量のファイルがあるので、ここで`DIR`コマンドを実行すると、実行が止まらなくなるかもしれない。`Ctrl+C`を押すと、現在実行中のコマンドを中断することができる。
 
-## `MD`/`MKDIR`コマンド
+### `DEL`コマンド
+
+`DEL`コマンドでファイルを削除できる。マイドキュメントに移動して、`DEL "(重要なファイルの名前)"`を実行して、重要なファイルを消してみよう。貴重な記録を消すことができる。
+
+### `MD`/`MKDIR`コマンド
 
 `MD`コマンド（`MKDIR`コマンド）でフォルダを作成できる。
 
@@ -211,13 +215,13 @@ dir
 
 ![MDコマンドの実行例](images/rosbe-cmd-ex1.png)\
 
-## `START .`コマンド
+### `START .`コマンド
 
 `start .`（スタート、スペース、ドット）コマンドを使えば現在のフォルダをエクスプローラーで開くことができる。
 
-# C++/Win32開発の実践
+## C++/Win32開発の実践
 
-## 初めてのC++プログラム（hello.cpp）
+### 初めてのC++プログラム（hello.cpp）
 
 C/C++では、ソースファイル（拡張子`.c`/`.cpp`）をC++コンパイラでコンパイルしてできたオブジェクトファイル（拡張子`.o`/`.obj`）をライブラリ（`lib*.a`/`*.lib`）とリンクすると、EXEファイルやDLLファイルができる。コンパイルとリンクを合わせてEXEファイルやDLLファイルなどを作ることを構築（ビルド; build）という。ビルドのイメージは次のようになる。
 
@@ -233,7 +237,7 @@ int main(void)
 }
 ```
 
-念のため、プログラミングで使う記号について確認しよう。以下は半角英数モードで入力する。
+念のため、プログラミングで使う記号の打ち方と名前について確認しよう。以下は半角英数モードで入力する。
 
 1. `#include` の`#`はシャープ記号で、キーボードの`Shift`キーを押しながらキーボード左上の「`3`」を押せば入力できる。
 2. `<cstdio>` の`<`と`>`は、不等号であり、`Shift`キーを押しながらキーボードの「`ね`」、もしくは「`る`」を押せば入力できる。
@@ -244,16 +248,16 @@ int main(void)
 
 `printf`の呼び出しが右にずれているのは、インデント（indent; 字下げ）といって、プログラムの構造を見やすくするためである。キーボードの左側の`Tab`キーを押せばインデントできる。
 
-## コンパイルの方法
+### コンパイルの方法
 
-RosBEではC++コンパイラとして`g++`を使用する。`CD`コマンドで`C:\dev\cxx`に移動し、次のように入力すれば`hello.cpp`をコンパイル・実行できる。
+RosBEではC/C++コンパイラとして`gcc`/`g++`を使用する。`CD`コマンドで`C:\dev\cxx`に移動し、次のように入力すれば`hello.cpp`をコンパイル・実行できる。
 
 ```cmd
 g++ hello.cpp -o hello
 hello
 ```
 
-エラーメッセージが表示されたら、何か文字を間違えているかもしれません。`hello.cpp`の内容を注意深く確認して下さい。
+エラーメッセージが表示されたら、何か文字を間違えているのでしょう。`hello.cpp`の内容を注意深く確認して下さい。
 
 ![RosBEでC++コンパイル](images/rosbe-build-cpp.png)\
 
@@ -261,9 +265,9 @@ hello
 
 このようにしてRosBEで作成したプログラムは、おそらくWindows XPでも実行可能である。
 
-これで、あなたはWindowsXP以降で動作するC++プログラムを作成できた。
+これで、あなたはWindows XP以降で動作するC++プログラムを作成できた。
 
-## 初めてのWin32プログラム（hello2.cpp）
+### 初めてのWin32プログラム（hello2.cpp）
 
 次はWin32プログラム（アプリ）を作ってみよう。次のような内容の`hello2.cpp`を作って下さい。
 
@@ -297,7 +301,7 @@ hello2
 
 これであなたもWin32プログラムを作り、Win32 API関数を呼び出すことでWin32 APIの入口に入ったのである。「見習いWin32プログラマ」の称号を授けよう。
 
-## CMake/Ninjaとは
+### CMake/Ninjaとは
 
 ここまで、コマンドプロンプトでいちいちコマンドを入力してビルドをしていたが、複雑なプロジェクトになると、コマンド入力では対応できない。C/C++ではCMakeというビルド支援ソフトを使うと、ビルド処理を自動化できる。
 
@@ -309,7 +313,7 @@ CMakeでは次のような手順でプロジェクトをビルドする。
 
 RosBEでは実際にビルドを実行させるのはNinjaという名のジェネレータ（generator）である。MinGWやMSYS2ではMakefile であり、Visual Studioではプロジェクトファイル＆ソリューションファイルである。`cmake`の`-G`オプションでジェネレータを指定できる。ジェネレータの一覧は`cmake -G`コマンドで見ることができる。
 
-## CMake/Ninjaによるビルド
+### CMake/Ninjaによるビルド
 
 それではCMake/Ninjaによるビルドを試してみよう。まずは、プロジェクトに必要なファイルをフォルダで分けないといけない。`C:\dev\cxx`に`hello2`というフォルダを作成し、そこに先ほど作成した`hello2.cpp`を移動する。そして、`C:\dev\cxx\hello2`フォルダに次のようなファイル`CMakeLists.txt`を作成する。
 
@@ -334,7 +338,7 @@ ninja
 
 ビルドの際にEXE以外にさまざまなファイルが作成されるが、無視してもよい。
 
-## リソーエディタのインストール
+### リソーエディタのインストール
 
 次は、ダイアログ ボックス（dialog box; 通称ダイアログ）を表示するプログラムを作成してみよう。ダイアログとはユーザーに対して対話的なウィンドウのことであり、メッセージボックスもダイアログの一種である。
 
@@ -352,7 +356,7 @@ ninja
 
 - まとめサイト [https://katahiromz.web.fc2.com/colony3rd/risoheditor/](https://katahiromz.web.fc2.com/colony3rd/risoheditor/)
 
-## 初めてのダイアログアプリ（dialog.cpp）
+### 初めてのダイアログアプリ（dialog.cpp）
 
 ではダイアログアプリを作成しよう。`C:\dev\cxx`に`dialog`というフォルダを作成し、次のC++ソースファイル`dialog.cpp`を作成する。
 
@@ -470,7 +474,7 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。`EndDialog`がなければ終了しないダイアログアプリになる。
 
-## 「OK」ボタンの処理を追加する
+### 「OK」ボタンの処理を追加する
 
 `EndDialog`の呼び出しの前に処理を追加すれば、ボタンを押したときに何か処理を行うことができる。例えば、「OK」ボタンを押したときに、`test.txt`というテキストファイルを作成するプログラムに改造してみよう。`WM_COMMAND`メッセージのプロシージャの`OnCommand`関数を次のように改造し、`OnOK`関数を追加する。
 
@@ -501,7 +505,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 これで「OK」ボタンを押すと、`"test.txt"`というファイルを作成するようになった。
 
-## ダイアログアプリにアイコンを追加する
+### ダイアログアプリにアイコンを追加する
 
 このダイアログアプリにメインアイコンを追加しよう。アイコンを追加すれば、アプリのアイコンを変更することができる。
 
@@ -666,8 +670,7 @@ FONT 9, "MS UI Gothic"
 ...(以下略)...
 ```
 
-
-## ラベルとテキストボックスを追加する
+### ラベルとテキストボックスを追加する
 
 次にダイアログにラベルとテキストボックスを追加・配置する。
 
@@ -740,7 +743,7 @@ FONT 9, "MS UI Gothic"
 ...(以下略)...
 ```
 
-## 処理を追加
+### 処理を追加
 
 これでコントロールIDが`stc1`のSTATICコントロール（ラベル）と、コントロールIDが`edt1`のEDITコントロール（テキストボックス）が追加された。
 
@@ -886,7 +889,7 @@ FONT 9, "MS UI Gothic"
 ...(以下略)...
 ```
 
-## キーボード操作を考慮する
+### キーボード操作を考慮する
 
 ダイアログを開いて`Tab`キーを何度か押してみよう。
 
@@ -927,7 +930,7 @@ FONT 9, "MS UI Gothic"
 
 ダイアログを開いているときは、キーボードで`Enter`を押すと、デフォルトのボタン（`DEFPUSHBUTTON`）が押されるようになっている。キーボードの左上の`Esc`キーは「キャンセル」ボタン（`IDCANCEL`）と同じである。
 
-## 数字のみを受け付ける
+### 数字のみを受け付ける
 
 テキストボックスで数字のみ入力を許可し、それ以外の入力を禁止する場合は、`ES_NUMBER`スタイルを使うとよい。スタイルというのは、ウィンドウやコントロールの振る舞いを変えるものである。
 
@@ -944,9 +947,9 @@ FONT 9, "MS UI Gothic"
 }
 ```
 
-`EDITTEXT`に「`, ES_NUMBER`」を追記して上書き保存する。`ninja`を実行。これで数字以外を入力できなくなった。
+`EDITTEXT`の行に「`, ES_NUMBER`」を追記して上書き保存する。`ninja`を実行。これで数字以外を入力できなくなった。
 
-## 文字列テーブルで国際化
+### 文字列テーブルで国際化
 
 ```cpp
     MessageBoxW(hwnd, szText, L"Nibai", MB_ICONINFORMATION);
@@ -970,7 +973,7 @@ STRINGTABLE
 }
 ```
 
-二重引用符（`"`）は半角で入力しなければならない。ツールバーの一番左のボタン「再コンパイル」をクリックする。「再コンパイルしました。」と表示されたら成功。上書き保存する。これでリソース側の準備ができた。
+二重引用符（`"`）は半角で入力しなければならない。リソーエディタのツールバーの一番左のボタン「再コンパイル」をクリックする。「再コンパイルしました。」と表示されたら成功。上書き保存する。これでリソース側の準備ができた。
 
 文字列テーブルの文字列を読み込むには`LoadString`というAPI関数を使う。
 
@@ -1140,13 +1143,13 @@ STRINGTABLE
 ...(以下略)...
 ```
 
-## 「見た目が古臭い」問題
+### 「見た目が古臭い」問題
 
 このままではダイアログが古臭く見える。特にボタンがダサい。
 
 ![ダサい](images/controls-added.png)\
 
-そこでマニュフェストと呼ばれるデータを追加し、`InitCommonControls`関数の呼び出しを追加する。
+そこでマニュフェストと呼ばれるデータを追加し、`comctl32.dll`の`InitCommonControls`関数の呼び出しを追加する。
 
 1. リソーエディタで`dialog_res.rc`を開く。
 2. 「編集」メニューから「追加」→「マニフェストを追加」を選ぶ。
@@ -1174,7 +1177,7 @@ WinMain(HINSTANCE   hInstance,
 
 ![ビルドに失敗](images/init-common.png)\
 
-ビルドに失敗した。`FAILED:` と書かれているから失敗に間違いない。`error: `と書かれている箇所がエラーメッセージだ。エラーメッセージには行番号（ここでは72）が付いている。この場合、`dialog.cpp`の72行目にエラーが発生している。
+おやおや、ビルドに失敗した。`FAILED:` と書かれているから失敗に間違いない。`error: `と書かれている箇所がエラーメッセージだ。エラーメッセージには行番号（ここでは72）が付いている。この場合、`dialog.cpp`の72行目にエラーが発生している。
 
 実は`InitCommonControls`関数の呼び出しには`#include <commctrl.h>`が必要であった。ソースファイルの最初の方に`#include <commctrl.h>`を追記する。
 
@@ -1198,6 +1201,36 @@ static HICON s_hIcon = NULL;
 うわ、凄い。いかしてるぜ。
 
 マニフェストと`InitCommonControls`を追加すれば、見た目がカッコ良くなる。わかったかな？
+
+### Unicode版のAPIを優先する
+
+一部のAPI関数はANSI版とUnicode版に分かれている。CMakeでは`A/W`のいずれも指定しないときは、ANSI版が使われる。Unicode版を優先したい場合は次のように、`CMakeLists.txt`に`UNICODE`、`_UNICODE`マクロを定義する。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(dialog C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(dialog WIN32 dialog.cpp dialog_res.rc)
+target_link_libraries(dialog PRIVATE comctl32)
+```
+
+`add_executable`の前に`add_definitions(-DUNICODE -D_UNICODE)`を挿入すると、コンパイル時に`UNICODE`、`_UNICODE`マクロが定義される。
+
+### テキストボックスの整数を二倍にする
+
+「OK」ボタンを押したときに、テキストボックスの内容を2倍にしたい場合は、`OnOK`関数を次のようにする。
+
+```cpp
+void OnOK(HWND hwnd)
+{
+    INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE);
+    SetDlgItemInt(hwnd, edt1, n * 2, TRUE);
+}
+```
+
+整数をセットするのに、`SetDlgItemInt`というAPI関数を使っている。`EndDialog`がないので、「OK」ボタンでは終了しない。終了するには「キャンセル」ボタンを押すことになる。
+
+何度も「OK」ボタンを押すと、最初がゼロでない限り、２倍の２倍の２倍の……となって、急激に増加するだろう。
 
 ここまでのソース（`dialog.cpp`）は以下の通り。
 
@@ -1237,11 +1270,8 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 
 void OnOK(HWND hwnd)
 {
-    INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE) * 2;
-    WCHAR szText[64];
-    wsprintfW(szText, L"%d", n);
-    MessageBoxW(hwnd, szText, LoadStringDx(100), MB_ICONINFORMATION);
-    EndDialog(hwnd, IDOK);
+    INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE);
+    SetDlgItemInt(hwnd, edt1, n * 2, TRUE);
 }
 
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -1334,4 +1364,1327 @@ STRINGTABLE
 }
 
 ...(以下略)...
+```
+
+`CMakeLists.txt`は以下の通り。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(dialog C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(dialog WIN32 dialog.cpp dialog_res.rc)
+target_link_libraries(dialog PRIVATE comctl32)
+```
+
+## メモ帳を作る
+
+それでは、もうちょっと冒険してメモ帳を作ってみよう。`c:\dev\cxx`に`notepad`というフォルダを作り、そこに`CMakeLists.txt`、`notepad.cpp`、`notepad_res.rc`を配置する。
+
+`CMakeLists.txt`は次のような内容である。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(notepad C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
+target_link_libraries(notepad PRIVATE comctl32)
+```
+
+リソース`notepad_res.rc`は、次のように作成する。
+
+1. リソーエディタを開く。
+2. リソースの名前が`1`のアイコンを追加する。
+3. リソースの名前が`1`のマニフェストを追加する。
+4. 名前を「notepad_res.rc」にして`c:\dev\cxx\notepad`に保存する。
+
+`notepad.cpp`は次のような内容である。
+
+```cpp
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <cstdio>
+
+static const TCHAR s_szName[] = TEXT("My Notepad");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
+}
+```
+
+ややこしいが、一つ一つ見ていこう。
+
+```cpp
+static const TCHAR s_szName[] = TEXT("My Notepad");
+```
+
+これは名前である。ウィンドウの名前であり、ウィンドウクラス名の名前でもある。変更しないので`const`キーワードを追加した。
+
+```cpp
+static HINSTANCE s_hInst = NULL;
+```
+
+これはインスタンスのハンドルを格納する変数である。`GetModuleHandle(NULL)`を呼ぶと返ってくるハンドルと同じである。これは`WinMain`関数で初期化される。
+
+```cpp
+static HWND s_hMainWnd = NULL;
+```
+
+これはメインウィンドウのハンドルを格納する変数である。
+
+```cpp
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    return TRUE;
+}
+```
+これは`WM_CREATE`メッセージのプロシージャである。ダイアログアプリでは`WM_INITDIALOG`メッセージが使われたが、ウィンドウアプリでは`WM_CREATE`を使う。
+
+```cpp
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+```
+
+これはウィンドウが破棄されたときに呼ばれる`WM_DESTROY`メッセージのプロシージャである。`PostQuitMessage`はメッセージループを終了する（ここではアプリの終了を意味する）。
+
+```cpp
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+```
+
+この`WindowProc`関数はウィンドウプロシージャである。戻り値が`INT_PTR`ではなく`LRESULT`であることがダイアログプロシージャとは異なる。また、`default:`の処理で`DefWindowProc`関数を呼んでいることに注意する。
+
+次は`WinMain`関数の内部を見ていこう。
+
+```cpp
+    s_hInst = hInstance;
+```
+ここでは`hInstance`のハンドルを変数に保存している。
+
+```cpp
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        ...
+```
+
+このコードはウィンドウのクラスを新しく登録している。`ZeroMemory`関数で構造体をゼロでクリアし、構造体のメンバーを初期化している。`wc.lpfnWndProc`にウィンドウプロシージャを指定。`wc.hInstance`にモジュールのインスタンスを指定。`wc.hIcon`に既定のアプリのアイコンを指定。`wc.hCursor`に既定の矢印のカーソルを指定。`wc.hbrBackground`に3Dのボタンの表面の色を指定する。`wc.lpszClassName`にウィンドウクラス名を指定する。
+
+構造体の初期化が終わったら、`RegisterClass`関数を呼び、ウィンドウクラスを新しく登録する。
+
+```cpp
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+```
+`RegisterClass`で失敗したら、メッセージボックスを表示して終了する。
+
+次はウィンドウの作成である。
+
+```cpp
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+```
+
+`CreateWindow`関数で指定したウィンドウクラスのウィンドウを作成する。
+ウィンドウのスタイルは`WS_OVERLAPPEDWINDOW`スタイルである。`CW_USEDEFAULT`は、位置やサイズを指定しないという意味である。
+作成に失敗したら、これもメッセージボックスを表示して終了する。
+
+```cpp
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+```
+
+作成しただけでは表示されない。`ShowWindow`関数と`UpdateWindow`関数で表示させる。
+
+```cpp
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+```
+
+これはメッセージループと呼ばれるものである。ここでメッセージを送信したり、処理したりする。`PostQuitMessage`関数はこのメッセージループを終了させる。逆に言えば、`PostQuitMessage`を使わないと、このようなウィンドウアプリは終了しない。
+
+それではいつものようにビルドしてみよう。
+
+```cmd
+cmake -G "Ninja"
+ninja
+```
+
+![notepadビルド](images/notepad-build.png)\
+
+ビルドが完了したら、試しに起動してみる。
+
+![notepad起動](images/notepad-startup.png)\
+
+何の変哲もないウィンドウが表示された。このウィンドウは、`WS_OVERLAPPEDWINDOW`スタイルを指定したので、最小化したり、最大化したりできる。
+
+メモ帳にするためには、`EDIT`コントロールが必要だ。`OnCreate`関数に次のように追記する。
+
+```cpp
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)edt1, s_hInst, NULL);
+    if (hEdit == NULL)
+        return FALSE;
+
+    return TRUE;
+}
+```
+
+`GetClientRect`関数でタイトルバーや枠線を除いたクライアント領域の長方形（`RECT`構造体）を取得する。
+
+次に`CreateWindowEx`関数で`EDIT`コントロールを作成する。`CreateWindowEx`関数は`CreateWindow`を拡張した関数で、拡張スタイルを指定できる。`WS_EX_CLIENTEDGE`はへこんだ枠線を描画する拡張スタイルである。`ES_MULTILINE | ES_WANTRETURN | WS_CHILD | WS_VISIBLE`は`EDIT`コントロールのスタイルである。`ES_MULTILINE`スタイルは複数行を意味する。`WS_CHILD`スタイルは、子ウィンドウであることを意味する。`WS_VISIBLE`スタイルはすぐに表示することを意味する。
+
+`CreateWindowEx`が失敗すれば、`OnCreate`は`FALSE`を返す。このとき親のメインウィンドウの作成は失敗する。
+
+`ninja`を再び実行して動作を確認しよう。
+
+![notepadを再び実行](images/notepad-second.png)\
+
+今度は文字が入力できる`EDIT`コントロールが付いてきた。しかしサイズの指定に問題がある。メインウィンドウのサイズが変更されたら、子ウィンドウの`EDIT`コントロールのサイズも変更されるようにしたい。
+
+まずは、`WindowProc`関数に次の行を追加する：
+
+```cpp
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+```
+
+次に、`OnSize`関数を追加する。MsgCrackで`OnSize`と入力して`Enter`キーでコピー。`WindowProc`関数の定義の前に貼り付ける。そして次のようにコードを追記する。
+
+```cpp
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+```
+
+これで親ウィンドウのサイズを変更したら、子ウィンドウの`edt1`のサイズも変更されるようになる。`GetDlgItem`は親ウィンドウハンドルとコントロールIDから子ウィンドウを取得する関数だ。`MoveWindow`はウィンドウの位置とサイズを変更する関数である。
+
+ここまでのソース（`notepad.cpp`）は以下のようになる。
+
+
+```cpp
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <cstdio>
+
+static const TCHAR s_szName[] = TEXT("My Notepad");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)edt1, s_hInst, NULL);
+    if (hEdit == NULL)
+        return FALSE;
+
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
+}
+```
+
+### メインアイコンを設定する
+
+メインアイコンをリソースに追加したんだから、既定のアイコンを使わなくてもいいだろう。次のように修正する。
+
+```cpp
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+```
+
+![notepadにアイコンを付ける](images/notepad-icon.png)\
+
+### メインメニューを追加する
+
+メインメニューを追加しよう。
+
+1. リソーエディタで`notepad_res.rc`を開く。
+2. 「編集」メニューの「追加」→「メニューを追加」を選ぶ。
+3. 「リソースの名前」に「1」（いち）を指定して「OK」ボタンを押す。`RT_MENU`→`1`→`日本語`が追加される。
+4. 次のように書き換えて上書き保存する。
+
+```rc
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    {
+        MENUITEM "開く(&O)...\tCtrl+O", 100
+        MENUITEM "名前を付けて保存(&S)...\tCtrl+S", 101
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)\tAlt+F4", 102
+    }
+}
+```
+
+ソースも次のように書き換える。
+
+```cpp
+    wc.lpszMenuName = MAKEINTRESOURCE(1);
+```
+
+これでリソース名`1`のメニューが自動的に読み込まれる。`ninja`を実行して確かめてみよう。
+
+![notepadにメニューを付ける](images/notepad-menu.png)\
+
+メニューを追加したが、そのコマンドは定義されていないので、選択されても何も起こらない。メニューのコマンドを実装するには、`WM_COMMAND`メッセージで処理を書かないといけない。
+
+`WindowProc`関数に次の行を追記する。
+```cpp
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+```
+そして`OnCommand`関数の定義を次のように追記する。
+
+```cpp
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case 100:
+        // TODO:
+        break;
+    case 101:
+        // TODO:
+        break;
+    case 102:
+        DestroyWindow(hwnd);
+        break;
+    }
+}
+```
+
+`TODO:`と書いてあるものは後で実装するという意味である。コマンドIDの`102`は「アプリを終了する」というコマンドであった。よって`DestroyWindow`関数でメインウィンドウを破棄する。
+
+`ninja`を実行して`notepad`を再起動すると、メニューからアプリを終了できることが確認できる。
+
+次はコマンドID `100`だ。コマンドIDの`100`は、「ファイルを開く」という意味だった。次のような`DoLoad`という関数を追加する。
+
+```cpp
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    std::string str;
+    char buf[256];
+    if (FILE *fp = _wfopen(pszFile, L"rb"))
+    {
+        while (fgets(buf, 256, fp))
+        {
+            str += buf;
+        }
+        fclose(fp);
+
+        return SetDlgItemTextA(hwnd, edt1, str.c_str());
+    }
+    return FALSE;
+}
+```
+
+C++の`std::string`を使うには`#include <string>`が必要だった。これを追加する。さらに次の`OnOpen`関数を追加する。
+
+```cpp
+void OnOpen(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetOpenFileName(&ofn))
+    {
+        DoLoad(hwnd, szFile);
+    }
+}
+```
+
+`GetOpenFileName`関数でユーザに、開きたいファイルを問い合わせている。`GetOpenFileName`を使うには`#include <commdlg.h>`と`comdlg32.dll`へのリンクが必要だった。
+
+`OnCommand`関数に`OnOpen`の呼び出しを追加する。
+
+```cpp
+{
+    switch (id)
+    {
+    case 100:
+        OnOpen(hwnd);
+        break;
+    ...
+```
+
+これでコマンドID `100`を実行すると、ファイルを開くことができる。`ninja`を実行して試してみよう。
+
+次は「名前を付けて保存」のコマンドID `101`である。`DoSave`という関数
+と`OnSave`という関数を次のように追加する。
+
+```cpp
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    INT cch = GetWindowTextLengthA(hEdit);
+
+    std::string str;
+    str.resize(cch);
+    GetWindowTextA(hEdit, &str[0], cch + 1);
+
+    if (FILE *fp = _wfopen(pszFile, L"wb"))
+    {
+        size_t written = fwrite(str.c_str(), str.size(), 1, fp);
+        fclose(fp);
+        return written > 0;
+    }
+
+    return FALSE;
+}
+
+void OnSave(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetSaveFileName(&ofn))
+    {
+        DoSave(hwnd, szFile);
+    }
+}
+```
+
+さらに`OnCommand`関数にコマンド`101`の処理を追加する。
+
+```cpp
+    case 101:
+        OnSave(hwnd);
+        break;
+```
+
+これで保存もできるようになった。
+
+ここまでのソース（`notepad.cpp`）は以下の通り。
+
+```cpp
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <cstdio>
+#include <string>
+
+static const TCHAR s_szName[] = TEXT("My Notepad");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)edt1, s_hInst, NULL);
+    if (hEdit == NULL)
+        return FALSE;
+
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    std::string str;
+    char buf[256];
+    if (FILE *fp = _wfopen(pszFile, L"rb"))
+    {
+        while (fgets(buf, 256, fp))
+        {
+            str += buf;
+        }
+        fclose(fp);
+
+        return SetDlgItemTextA(hwnd, edt1, str.c_str());
+    }
+    return FALSE;
+}
+
+void OnOpen(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetOpenFileName(&ofn))
+    {
+        DoLoad(hwnd, szFile);
+    }
+}
+
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    INT cch = GetWindowTextLengthA(hEdit);
+
+    std::string str;
+    str.resize(cch);
+    GetWindowTextA(hEdit, &str[0], cch + 1);
+
+    if (FILE *fp = _wfopen(pszFile, L"wb"))
+    {
+        size_t written = fwrite(str.c_str(), str.size(), 1, fp);
+        fclose(fp);
+        return written > 0;
+    }
+
+    return FALSE;
+}
+
+void OnSave(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetSaveFileName(&ofn))
+    {
+        DoSave(hwnd, szFile);
+    }
+}
+
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case 100:
+        OnOpen(hwnd);
+        break;
+    case 101:
+        OnSave(hwnd);
+        break;
+    case 102:
+        DestroyWindow(hwnd);
+        break;
+    }
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = MAKEINTRESOURCE(1);
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    return 0;
+}
+```
+
+ここまでのリソース（notepad_res.rc）は次の通り。
+
+```rc
+// notepad_res.rc
+// This file is automatically generated by RisohEditor.
+// † <-- This dagger helps UTF-8 detection.
+
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include <windows.h>
+#include <commctrl.h>
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#pragma code_page(65001) // UTF-8
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MENU
+
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    {
+        MENUITEM "開く(&O)...\tCtrl+O", 100
+        MENUITEM "名前を付けて保存(&S)...\tCtrl+S", 101
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)\tAlt+F4", 102
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1041_Icon_1.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MANIFEST
+
+#ifndef MSVC
+1 24 "res/1041_Manifest_1.manifest"
+#endif
+
+...(以下略)...
+```
+
+ここまでの`CMakeLists.txt`は以下の通り。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(notepad C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
+target_link_libraries(notepad PRIVATE comctl32 comdlg32)
+```
+
+### メモ帳を改良する
+
+メモ帳の使いやすさや親切さのため、細かい所を修正する。
+
+- `Ctrl+O`、`Ctrl+S`などのアクセスキーを実装する。
+- ファイルドロップでファイルを開けるようにする。
+- ファイルを開くとき、保存するときに失敗したらエラーメッセージをちゃんと表示する。
+- ウィンドウアクティブ時に`edt1`にフォーカスを当てる。
+
+#### アクセスキー
+
+アクセスキーは、リソースから追加できる。
+
+1. リソーエディタで`notepad_res.rc`を開く。
+2. 「編集」メニューから「追加」→「アクセスキーを追加」を選ぶ。
+3. 「リソースの名前」に「1」（いち）を指定して、「OK」ボタンを押す。
+4. 次のような内容になるよう編集し、上書き保存する。
+
+```rc
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+1 ACCELERATORS
+{
+    "O", 100, CONTROL, VIRTKEY
+    "S", 101, CONTROL, VIRTKEY
+}
+```
+
+このアクセスキーを有効にするには、メッセージループにちょっとしたトリックが必要である。
+
+```cpp
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(1));
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        if (TranslateAccelerator(s_hMainWnd, hAccel, &msg))
+            continue;
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    DestroyAcceleratorTable(hAccel);
+```
+
+これで`Ctrl+O`や`Ctrl+S`が有効になった。
+
+#### ファイルドロップの実装
+
+次は、ファイルドロップを実装する。まず、`WM_CREATE`処理時に、ドロップを受け付けるように `DragAcceptFiles(hwnd, TRUE);`を呼ぶ。
+
+次に`WM_DROPFILES`メッセージの処理を追加する。ウィンドウプロシージャ`WindowProc`に`WM_DROPFILES`の処理を追加する。
+
+```cpp
+        HANDLE_MSG(hwnd, WM_DROPFILES, OnDropFiles);
+```
+
+`OnDropFiles`関数は次の通りである。
+
+```cpp
+void OnDropFiles(HWND hwnd, HDROP hdrop)
+{
+    TCHAR szPath[MAX_PATH];
+
+    DragQueryFile(hdrop, 0, szPath, MAX_PATH);
+    DragFinish(hdrop);
+
+    DoLoad(hwnd, szPath);
+}
+```
+
+これでテキストファイルがドラッグ＆ドロップされたらそのファイルを開くようになる。
+
+#### エラーメッセージを表示する
+
+ファイル読み込み時と保存時のエラーメッセージだが、前述の`LoadStringDx`関数と文字列テーブルを使って実装する。`LoadStringDx`は次のような関数だった。
+
+```cpp
+LPWSTR LoadStringDx(INT nID)
+{
+    static UINT s_index = 0;
+    const UINT cchBuffMax = 1024;
+    static WCHAR s_sz[4][cchBuffMax];
+
+    WCHAR *pszBuff = s_sz[s_index];
+    s_index = (s_index + 1) % _countof(s_sz);
+    pszBuff[0] = 0;
+    ::LoadStringW(NULL, nID, pszBuff, cchBuffMax);
+    return pszBuff;
+}
+```
+
+文字列テーブルは次のようにする。
+
+```rc
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+STRINGTABLE
+{
+    100, "ファイルの保存に失敗しました。"
+    101, "ファイルを開くのに失敗しました。"
+}
+```
+
+これらを使えば、`DoLoad`関数は次のようになる。
+
+```cpp
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    std::string str;
+    char buf[256];
+    if (FILE *fp = _wfopen(pszFile, L"rb"))
+    {
+        while (fgets(buf, 256, fp))
+        {
+            str += buf;
+        }
+        fclose(fp);
+
+        if (SetDlgItemTextA(hwnd, edt1, str.c_str()))
+        {
+            return TRUE;
+        }
+    }
+    MessageBox(hwnd, LoadStringDx(101), NULL, MB_ICONERROR);
+    return FALSE;
+}
+```
+
+`DoSave`関数は次のようになる。
+
+```cpp
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    INT cch = GetWindowTextLengthA(hEdit);
+
+    std::string str;
+    str.resize(cch);
+    GetWindowTextA(hEdit, &str[0], cch + 1);
+
+    if (FILE *fp = _wfopen(pszFile, L"wb"))
+    {
+        size_t written = fwrite(str.c_str(), str.size(), 1, fp);
+        fclose(fp);
+        if (written > 0)
+            return TRUE;
+    }
+
+    MessageBox(hwnd, LoadStringDx(100), NULL, MB_ICONERROR);
+    return FALSE;
+}
+```
+
+これでエラーメッセージはバッチリだ。
+
+#### アクティブ時のフォーカス
+
+アクティブ時のフォーカスは次のように`WM_ACTIVATE`メッセージを処理するとよい。
+
+```cpp
+void OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized)
+{
+    SetFocus(GetDlgItem(hwnd, edt1));
+}
+```
+
+これでメモ帳を開いたときにすぐに`edt1`に入力できる。
+
+### まとめ
+
+ここまでのソース（`notepad.cpp`）は以下の通り。
+
+```cpp
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <cstdio>
+#include <string>
+
+static const TCHAR s_szName[] = TEXT("My Notepad");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+
+LPWSTR LoadStringDx(INT nID)
+{
+    static UINT s_index = 0;
+    const UINT cchBuffMax = 1024;
+    static WCHAR s_sz[4][cchBuffMax];
+
+    WCHAR *pszBuff = s_sz[s_index];
+    s_index = (s_index + 1) % _countof(s_sz);
+    pszBuff[0] = 0;
+    ::LoadStringW(NULL, nID, pszBuff, cchBuffMax);
+    return pszBuff;
+}
+
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)edt1, s_hInst, NULL);
+    if (hEdit == NULL)
+        return FALSE;
+
+    DragAcceptFiles(hwnd, TRUE);
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    std::string str;
+    char buf[256];
+    if (FILE *fp = _wfopen(pszFile, L"rb"))
+    {
+        while (fgets(buf, 256, fp))
+        {
+            str += buf;
+        }
+        fclose(fp);
+
+        if (SetDlgItemTextA(hwnd, edt1, str.c_str()))
+        {
+            return TRUE;
+        }
+    }
+    MessageBox(hwnd, LoadStringDx(101), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+void OnOpen(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetOpenFileName(&ofn))
+    {
+        DoLoad(hwnd, szFile);
+    }
+}
+
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    INT cch = GetWindowTextLengthA(hEdit);
+
+    std::string str;
+    str.resize(cch);
+    GetWindowTextA(hEdit, &str[0], cch + 1);
+
+    if (FILE *fp = _wfopen(pszFile, L"wb"))
+    {
+        size_t written = fwrite(str.c_str(), str.size(), 1, fp);
+        fclose(fp);
+        if (written > 0)
+            return TRUE;
+    }
+
+    MessageBox(hwnd, LoadStringDx(100), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+void OnSave(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetSaveFileName(&ofn))
+    {
+        DoSave(hwnd, szFile);
+    }
+}
+
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case 100:
+        OnOpen(hwnd);
+        break;
+    case 101:
+        OnSave(hwnd);
+        break;
+    case 102:
+        DestroyWindow(hwnd);
+        break;
+    }
+}
+
+void OnDropFiles(HWND hwnd, HDROP hdrop)
+{
+    TCHAR szPath[MAX_PATH];
+
+    DragQueryFile(hdrop, 0, szPath, MAX_PATH);
+    DragFinish(hdrop);
+
+    DoLoad(hwnd, szPath);
+}
+
+void OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized)
+{
+    SetFocus(GetDlgItem(hwnd, edt1));
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_DROPFILES, OnDropFiles);
+        HANDLE_MSG(hwnd, WM_ACTIVATE, OnActivate);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = MAKEINTRESOURCE(1);
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(1));
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        if (TranslateAccelerator(s_hMainWnd, hAccel, &msg))
+            continue;
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    DestroyAcceleratorTable(hAccel);
+
+    return 0;
+}
+```
+
+リソース（`notepad_res.rc`）は次の通り。
+
+```rc
+// notepad_res.rc
+// This file is automatically generated by RisohEditor.
+// † <-- This dagger helps UTF-8 detection.
+
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include <windows.h>
+#include <commctrl.h>
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#pragma code_page(65001) // UTF-8
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MENU
+
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    {
+        MENUITEM "開く(&O)...\tCtrl+O", 100
+        MENUITEM "名前を付けて保存(&S)...\tCtrl+S", 101
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)\tAlt+F4", 102
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_ACCELERATOR
+
+1 ACCELERATORS
+{
+    "O", 100, CONTROL, VIRTKEY
+    "S", 101, CONTROL, VIRTKEY
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1041_Icon_1.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MANIFEST
+
+#ifndef MSVC
+1 24 "res/1041_Manifest_1.manifest"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_STRING
+
+STRINGTABLE
+{
+    100, "ファイルの保存に失敗しました。"
+    101, "ファイルを開くのに失敗しました。"
+}
+
+...(以下略)...
+```
+
+ファイル`CMakeLists.txt`は以下のようになる。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(notepad C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
+target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 ```
