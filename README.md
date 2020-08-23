@@ -1399,7 +1399,7 @@ target_link_libraries(notepad PRIVATE comctl32)
 1. リソーエディタを開く。
 2. リソースの名前が`1`のアイコンを追加する。
 3. リソースの名前が`1`のマニフェストを追加する。
-4. 名前を「notepad_res.rc」にして`c:\dev\cxx\notepad`に保存する。
+4. 名前を「`notepad_res.rc`」にして`c:\dev\cxx\notepad`に保存する。
 
 `notepad.cpp`は次のような内容である。
 
