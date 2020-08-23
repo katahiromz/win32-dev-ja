@@ -2216,6 +2216,7 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 - ファイルドロップでファイルを開けるようにする。
 - ファイルを開くとき、保存するときに失敗したらエラーメッセージをちゃんと表示する。
 - ウィンドウアクティブ時に`edt1`にフォーカスを当てる。
+- `edt1`に等幅フォントを指定する。
 
 #### アクセスキー
 
@@ -2378,6 +2379,35 @@ void OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized)
 
 これでメモ帳を開いたときにすぐに`edt1`に入力できる。
 
+### 等幅フォントを指定する
+
+`OnCreate`で`edt1`に等幅フォントを設定しよう。まずはフォントハンドルを保持する変数`s_hFont`を追加する。
+
+```cpp
+static HFONT s_hFont = NULL;
+```
+
+次に、`OnCreate`で等幅フォント作成と設定を行う。
+
+```cpp
+    LOGFONT lf = { -14 };
+    lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+    s_hFont = CreateFontIndirect(&lf);
+
+    SetWindowFont(hEdit, s_hFont, TRUE);
+```
+
+これで等幅フォント作成と設定ができた。最後に`s_hFont`を破棄する。
+
+```cpp
+    DeleteObject(s_hFont);
+```
+
+これでフォントの設定は完了した。
+
+![等幅フォントの設定](images/notepad-fixed-pitch.png)\
+
 ### まとめ
 
 ここまでのソース（`notepad.cpp`）は以下の通り。
@@ -2394,6 +2424,7 @@ static const TCHAR s_szName[] = TEXT("My Notepad");
 
 static HINSTANCE s_hInst = NULL;
 static HWND s_hMainWnd = NULL;
+static HFONT s_hFont = NULL;
 
 LPWSTR LoadStringDx(INT nID)
 {
@@ -2422,6 +2453,14 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
         return FALSE;
 
     DragAcceptFiles(hwnd, TRUE);
+
+    LOGFONT lf = { -14 };
+    lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+    s_hFont = CreateFontIndirect(&lf);
+
+    SetWindowFont(hEdit, s_hFont, TRUE);
+
     return TRUE;
 }
 
@@ -2610,6 +2649,7 @@ WinMain(HINSTANCE   hInstance,
     }
 
     DestroyAcceleratorTable(hAccel);
+    DeleteObject(s_hFont);
 
     return 0;
 }
