@@ -42,8 +42,8 @@
 
 以下の２つの文字列を比較してほしい：
 
-- `"ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９＃！＠"`
-- `"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#!@"`
+- `ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ０１２３４５６７８９＃！＠`
+- `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#!@`
 
 前者が全角（ぜんかく）文字で、後者が半角（はんかく）文字である。昔のパソコンでは全角文字は半角文字の二倍の幅を持っていた。半角文字の多くは英語のASCII文字と互換性があり、英語圏でも同じデータでやり取りできるが、全角文字を日本語ではないパソコンで表示しようとすると問題が発生することがある。
 
@@ -103,7 +103,7 @@ Windowsでは、アプリでファイルを開くと、アプリはそのファ�
 
 ### EXEファイルとDLLファイル
 
-Windowsのプログラムのほとんどは、`.exe`という拡張子を持ったEXEファイルで出来ている。EXEファイルをダブルクリックするとプログラムを起動できるかもしれない。`.exe`の実行に必要な`DLL`ファイル（`*.dll`）が足りないと、実行に失敗する。
+Windowsのプログラムのほとんどは、`.exe`という拡張子を持ったEXEファイルで出来ている。EXEファイルをダブルクリックするとプログラムを起動できるかもしれない。`.exe`の実行に必要な`DLL`ファイル（拡張子`.dll`）が足りないと、実行に失敗する。DLLとはdynamic linked libraryの略で、EXEの機能を拡張するために、実行の際に読み込まれる外部ライブラリのことである。ライブラリ（library）というのは、C言語などで使用できる関数をまとめたものである。
 
 ### プロセス
 
@@ -115,13 +115,29 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 # 開発環境の整備
 
+## どんなパソコンが必要か
+
+パソコン（PC）の OS は64ビット版のWindows 10で決まり。記憶媒体には、ハードディスク（HDD）は遅いので SSD の 200GB 以上を選択する。メインメモリは4GB以上を選択する。
+
+ノートパソコンとデスクトップパソコンの2種類あるが、デスクトップの方が安い。オフィスソフトは必要になったときに買えばいい。LibreOfficeという無料のオフィス互換ソフトもある。これでだいたい6万円くらいになる。中古を選べば5万円くらいで購入できるが、品質が保証されないので注意。
+
+## リファレンスは便利
+
+開発を進めるとき、「リファレンス マニュアル」というものがあれば、関数の使い方をすぐ確認できて便利だし、時間の節約になる。C/C++のマニュアルや「Win32 Programmer's Reference」などをパソコンに入れて使うとよい。
+
 ## どんな開発環境を使うか
 
 通常、WindowsでC/C++コンパイラを使いたい場合、Visual Studio か MSYS2 を使うといい。Visual Studio（以下VS）はパワフルな統合開発環境（IDE）で非常に使いやすい。MSYS2はCUIベースの開発環境で、低スペックのPCでも使える。MSYS2は最小限のWindows開発環境「MinGW」にLinuxライクなBashシェルを追加したようなもので、ちょびっとLinux風に使える開発環境だ。
 
 簡単なプログラムをコンパイルしたい場合は、最近ではオンラインコンパイラという選択肢もあるが、ソースファイルが1つしか使えないとか、そもそもWin32をサポートしていないなどの制限がある。
 
-この文書では簡単のため、開発環境として ReactOS Build Environment (RosBE) を使用する。
+この文書では簡単のため、開発環境として ReactOS Build Environment (RosBE) を使用する。RosBEなら
+
+- C/C++/Win32コンパイラがついてくる
+- 制作したアプリはそのままWindows XPで実行できる
+- CMakeがついてくる
+
+という利点がある。
 
 ## RosBEのインストール
 
@@ -197,7 +213,9 @@ dir
 
 ## 初めてのC++プログラム（hello.cpp）
 
-C++では、ソースと呼ばれるテキストファイルを作成し、それをC++コンパイラでコンパイル（ビルド）して、EXEファイルを作成する。
+C/C++では、ソースファイル（拡張子`.c`/`.cpp`）をC++コンパイラでコンパイルしてできたオブジェクトファイル（拡張子`.o`/`.obj`）をライブラリ（`lib*.a`/`*.lib`）とリンクすると、EXEファイルやDLLファイルができる。コンパイルとリンクを合わせてEXEファイルやDLLファイルなどを作ることを構築（ビルド; build）という。ビルドのイメージは次のようになる。
+
+![ビルドのイメージ](images/build-image.png)
 
 それでは、実際にソースファイルを作成しよう。`C:\dev\cxx`に次のような内容の`hello.cpp`というテキストファイルを作成して下さい。
 
@@ -218,6 +236,8 @@ int main(void)
 5. `\`は、バックスラッシュ（\）または半角の円記号（￥）であり、半角英数モードでキーボード右下の「`ろ`」を押せば入力できる。
 6. `;`は、セミコロンである。半角英数モードでキーボードの「`れ`」を押せば入力できる。
 
+`printf`の呼び出しが右にずれているのは、インデント（indent; 字下げ）といって、プログラムの構造を見やすくするためである。キーボードの左側の`Tab`キーを押せばインデントできる。
+
 ## コンパイルの方法
 
 RosBEではC++コンパイラとして`g++`を使用する。`CD`コマンドで`C:\dev\cxx`に移動し、次のように入力すれば`hello.cpp`をコンパイル・実行できる。
@@ -235,7 +255,7 @@ hello
 
 このようにしてRosBEで作成したプログラムは、おそらくWindows XPでも実行可能である。
 
-これで、あなたはC++プログラムを作成できた。
+これで、あなたはWindowsXP以降で動作するC++プログラムを作成できた。
 
 ## 初めてのWin32プログラム（hello2.cpp）
 
@@ -269,23 +289,23 @@ hello2
 
 コマンドプロンプトから`hello2.exe`を実行できるし、`hello2.exe`をダブルクリックしても実行可能である。
 
-これであなたもWin32 APIの入口に入ったのである。
+これであなたもWin32プログラムを作り、Win32 APIの入口に入ったのである。
 
 ## CMake/Ninjaとは
 
-ここまで、コマンドプロンプトでコマンドを入力してビルドをしていたが、複雑なプロジェクトになると、コマンド入力では対応できない。C/C++ではCMakeというビルド支援ソフトを使うと、ビルド処理を自動化できる。
+ここまで、コマンドプロンプトでいちいちコマンドを入力してビルドをしていたが、複雑なプロジェクトになると、コマンド入力では対応できない。C/C++ではCMakeというビルド支援ソフトを使うと、ビルド処理を自動化できる。
 
 CMakeでは次のような手順でプロジェクトをビルドする。
 
-1. プロジェクトのフォルダに`CMakeLists.txt`というテキストファイルを作成する。`CMakeLists.txt`には、プロジェクトのビルド方法を特殊な言葉で記述する。
+1. プロジェクトのフォルダに`CMakeLists.txt`というテキストファイルを作成する。`CMakeLists.txt`には、プロジェクトのビルド方法をCMakeの言葉で記述する。
 2. CMakeプログラムを起動して`CMakeLists.txt`からビルドに必要なファイルを生成させる。
 3. 生成されたファイルを使ってプロジェクトをビルドする。
 
-RosBEでは実際にビルドを実行させるのはNinjaである。MinGWやMSYS2ではMakefile であり、Visual Studioではプロジェクトファイル＆ソリューションファイルである。
+RosBEでは実際にビルドを実行させるのはNinjaという名のジェネレータ（generator）である。MinGWやMSYS2ではMakefile であり、Visual Studioではプロジェクトファイル＆ソリューションファイルである。`cmake`の`-G`オプションでジェネレータを指定できる。ジェネレータの一覧は`cmake -G`コマンドで見ることができる。
 
 ## CMake/Ninjaによるビルド
 
-それではCMake/Ninjaによるビルドを試してみよう。まずは、プロジェクトに必要なファイルをフォルダで分けないといけない。`C:\dev\cxx`に`hello2`というフォルダを作成し、そこに先ほど作成した`hello2.cpp`を移動する。`C:\dev\cxx`に次のようなファイル`CMakeLists.txt`を作成する。
+それではCMake/Ninjaによるビルドを試してみよう。まずは、プロジェクトに必要なファイルをフォルダで分けないといけない。`C:\dev\cxx`に`hello2`というフォルダを作成し、そこに先ほど作成した`hello2.cpp`を移動する。そして、`C:\dev\cxx`に次のようなファイル`CMakeLists.txt`を作成する。
 
 ```txt
 cmake_minimum_required(VERSION 2.4)
@@ -314,7 +334,7 @@ ninja
 
 しかし、簡単にダイアログを作成するには「リソースファイル」（拡張子`.rc`）というものが必要になる。そこで、リソースを編集・作成するための「リソースエディタ」というものが必要になる。
 
-この文書ではリソースエディタとして「リソーエディタ」（RisohEditor）を推奨する。次のリンクからリソーエディタをダウンロード＆インストールして下さい。
+この文書ではリソースエディタとして「リソーエディタ」（RisohEditor）を使用する。次のリンクからリソーエディタをダウンロード＆インストールして下さい。
 
 - [リソーエディタ https://katahiromz.web.fc2.com/re/ja/](https://katahiromz.web.fc2.com/re/ja/)
 
@@ -322,7 +342,7 @@ ninja
 
 ![リソーエディタ](images/RisohEditor.png)
 
-## 初めてのダイアログプログラム（dialog.cpp）
+## 初めてのダイアログアプリ（dialog.cpp）
 
 ではダイアログアプリを作成しよう。`C:\dev\cxx`に`dialog`というフォルダを作成し、次のC++ソースファイル`dialog.cpp`を作成する。
 
@@ -369,13 +389,13 @@ WinMain(HINSTANCE   hInstance,
 ```
 
 急にプログラムがややこしくなったが、１つ１つ理解していけば問題ない。
-`#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。これらは典型的なイベント駆動型のプログラミングである。
+`#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。ダイアログプロシージャは典型的なイベント駆動型プログラミングを実装する。
 
-main関数の代わりに`WinMain`という関数を使う。main関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不必要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。
+ここでは、main関数の代わりに`WinMain`という関数を使う。main関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不必要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。
 
-開発が進むにつれて、複雑なコードを入力するはめになるが、`WinMain`や`DialogProc`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。
+開発が進むにつれて、複雑なコードを無数に入力するはめになるが、`WinMain`や`DialogProc`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。
 
-次はリソースファイルである。リソーエディタで以下の手順に従って`dialog_res.rc`ファイルを作成する。
+次はリソースファイルである。リソーエディタで以下の手順に従って`dialog_res.rc`ファイルを作成する。`dialog_res`の下線（`_`）は、`Shift`キーを押しながら「`ろ`」で入力する。名前に`_res`を付けたのはオブジェクトファイルの名前を衝突させないためである。
 
 1. リソーエディタを開く。
 2. 「編集」メニューから「追加」→「ダイアログを追加」を選び、「リソースの名前」に「1」（いち）を入力し、「OK」ボタンを押す。`RT_DIALOG`→`1`→`日本語`が追加される。
@@ -430,125 +450,104 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 ![dialogのビルド](images/dialog-build.png)
 
-少し解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
+解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
 
 それでは`dialog.exe`を実行してみよう。次のようなダイアログが開かれるはずである。
 
 ![dialog.exeのイメージ](images/dialog.png)
 
-「OK」や「キャンセル」を押しても`EndDialog`関数でダイアログを終了するだけで何も面白くない。`EndDialog`の呼び出しの前に処理を追加すれば、ボタンを押したときに何か処理を行うことができる。`MesssageBoxA`関数の呼び出しを追加したり、ダイアログのリソースを編集したりすると面白いかもしれない。
+「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。
 
-## ウェブサービスを利用して活動を始める
+## 「OK」ボタンの処理を追加する。
 
-ウェブサービスを利用するためには、ユーザIDとパスワードを使ってログインすることが、個人認証のために必要。
+`EndDialog`の呼び出しの前に処理を追加すれば、ボタンを押したときに何か処理を行うことができる。例えば、「OK」ボタンを押したときに、`test.txt`というテキストファイルを作成するプログラムに改造してみよう。`WM_COMMAND`メッセージのプロシージャの`OnCommand`関数を次のように改造し、`OnOK`関数を追加する。
 
-まず、名無しで活動するか、実名で活動するか考える。実力がないなら実名は避けたほうがいい。
+```cpp
+void OnOK(HWND hwnd)
+{
+    if (FILE *fp = fopen("test.txt", "w"))
+    {
+        fprint(fp, "This is a test.\n");
+        fclose(fp);
+    }
+    EndDialog(hwnd, IDOK);
+}
 
-アルファベットと数字を組み合わせて、適当に自分のユーザIDを決める（覚えやすいのがいい）。
-
-パスワードは十分長くて（12字以上）推測されにくいものを使う（短かったり、単純だと簡単にハッキングされる）。
-
-ユーザIDとパスワードは家のカギのように大事。わすれないようにしよう。
-
-パスワードはサービスごとに分けた方がいい。
-
-## メールアドレスを取得する
-
-GMail はGoogleが運営するウェブメールサービスだ。GMail でメールアドレスを取得する。必要事項を入力する。ログインすれば使えるようになる。
-
-GMail https://mail.google.com
-
-## GitHubアカウントを取得する
-
-GitHubは有用なソースコードがごろごろ転がっていて開発の参考になる。
-
-メールアドレスを使ってGitHubでアカウントを取得する。
-
-GitHub https://github.com
-
-## GitHubでレポジトリを作成する
-
-ローカルでGitの初期設定が必要。
-
-https://qiita.com/wnoguchi/items/f7358a227dfe2640cce3
-
-GitHubにログインしたら緑色の「New」ボタンを押して新規レポジトリを作成する。表示された画面に従ってGitコマンドをいくつか入力すれば GitHubのレポジトリを作成できる。レポジトリ名は「test」。
-
-```bash
-$ mkdir test                        # testフォルダを作成。
-$ cd test                           # testフォルダへ移動。
-$ echo "# test" >> README.md        # README.mdファイルを作成。
-$ git init                          # ローカルレポジトリの初期化。
-$ git commit -m "first commit"      # コミット。
-$ git remote add origin https://github.com/katahiromz/test.git      # リモートレポジトリの設定。
-$ git push -u origin master         # プッシュ（アップロードされる）。
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case IDOK:
+        OnOK(hwnd);
+        break;
+    case IDCANCEL:
+        EndDialog(hwnd, id);
+        break;
+    }
+}
 ```
 
-最後のコマンドでユーザIDとパスワードが要求されるので入力する（入力内容は画面に表示されない）。
+これで「OK」ボタンを押すと、`"test.txt"`というファイルを作成するようになった。
 
-## GitHubで`hello.cpp`を公開する
+## ダイアログアプリにアイコンを追加する
 
-再び緑色の「New」ボタンを押して`hello.cpp`を全世界に公開しよう。
+このダイアログアプリにメインアイコンを追加しよう。アイコンを追加すれば、アプリのアイコンを変更することができる。
 
-```bash
-$ cd ..　　　　　　　　　　　　　　　　　　# 一つ上のフォルダへ移動。
-$ cd hello                              #  helloフォルダへ移動。
-$ git init                              # ローカルレポジトリの初期化。
-$ git add hello.cpp CMakeLists.txt      # レポジトリにファイルを追加。
-$ git commit -m "first commit"          # 追加したファイルをコミット。
-$ git remote add origin https://github.com/katahiromz/hello.git   # リモートレポジトリの設定。
-$ git push -u origin master             # プッシュ（アップロード）。
+1. インターネットから「無料素材」のアイコンファイル (拡張子`.ico`)をダウンロードする。
+1. リソーエディタで`dialog_res.rc`を開く。
+2. 「編集」メニューから「追加」→「アイコンを追加」を順番に選ぶ。
+3. 「参照」ボタンを押してアイコンファイルを指定する。
+4. リソースの名前に「1」（いち）と入力する
+5. 「OK」ボタンを押すと、`RT_GROUP_ICON`と`RT_ICON`が追加される。
+6. 上書き保存する。
+
+![アイコンを追加](images/add-icon.png)
+
+さらにダイアログでこのアイコンを使うように`WM_INITDIALOG`のプロシージャを変更しよう。
+
+```cpp
+static HICON s_hIcon = NULL;
+static HICON s_hIconSmall = NULL;
+
+BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
+{
+    HINSTANCE hinst = GetModuleHandle(NULL);
+    s_hIcon = LoadIcon(hinst, MAKEINTRESOURCE(1));
+    s_hIconSmall = 
+        (HICON)LoadImage(hinst, MAKEINTRESOURCE(1), IMAGE_ICON,
+            GetSystemMetrics(SM_CXSMICON),
+            GetSystemMetrics(SM_CYSMICON), 0);
+    SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)s_hIcon);
+    SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)s_hIconSmall);
+
+    return TRUE;
+}
 ```
 
-`https://github.com/katahiromz/hello.git`の`katahiromz`には自分のIDが入る。
+一つずつ説明しよう。`s_hIcon`と`s_hIconSmall`はアイコンのハンドルを格納するための変数である。ハンドルというものを使えば、Win32の様々な操作対象を操作できる。`GetModuleHandle(NULL)`は現在のアプリのインスタンス（モジュール）を取得する。これは現在のEXEのアイコンを読み込むために使用する。`LoadIcon`は通常の大きさ(32x32)のアイコンを読み込むAPI関数だ。リソース名には`1`を指定している。`LoadImage` API 関数は小さいアイコン(16x16)を読み込むために使っている。`GetSystemMetrics` API 関数は小さいアイコンのサイズを取得するために使用する。小さいアイコンは通常16x16ピクセルだが、システムによっては違う値の可能性もある。
 
-## `.gitignore`ファイルを追加する
+`SendMessage`関数でダイアログのウィンドウに`WM_SETICON`メッセージを送信すると、ダイアログにアイコンをセットできる。
 
-`.gitignore`ファイルはテキストファイルで、改行区切りで無視したいファイルのパターン（ワイルドカード）を記載する。
+使い終わったアイコンは、`DestroyIcon`関数で破棄した方がよい。`WinMain`関数にアイコンの破棄コードを追記する。
 
-ビルドなどでフォルダやファイルが勝手に作られるが、それをレポジトリには含めたくないとき、本質的に重要ではないファイルやフォルダ、でかすぎるファイルなどは、`.gitignore`に記載するとよい。記載例は下の通り。
-
-```txt
-*.autosave
-*.cmake
-*.dir
-*.exe
-*.filters
-*.idb
-*.map
-*.ncb
-*.o
-*.obj
-*.opensdf
-*.res
-*.sdf
-*.sln
-*.suo
-*.tds
-*.user
-*.vcproj
-*.vcxproj
-*~
-.vs
-CMakeCache.txt
-CMakeFiles
-Debug
-Makefile
-Release
-TMP1.$$$
-build
-ipch
-x64
-*-old
-*.skrold
+```cpp
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    DialogBox(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc);
+    DestroyIcon(s_hIcon);
+    DestroyIcon(s_hIconSmall);
+    return 0;
+}
 ```
-ワイルドカードでは、`*`（アスタリスク）と`?`（疑問符）は特殊な意味がある。`*`は任意の0文字以上の文字列にマッチする。
 
-この`.gitignore`ファイルをレポジトリに追加しておく。
-```bash
-$ git add .gitignore
-$ git commit -m "add .gitignore"
-$ git push
-```
-この`.gitignore`ファイルを追加しておけば、`git status`の実行結果に無視ファイルが出てこないし、`git add -A`しても無視ファイルは追加されない。
+では、再び`ninja`を実行してビルドしよう。EXEファイルのアイコンが変更され、実行するとアイコン付きのダイアログになる。
 
+![アイコンを追加したダイアログ](images/icon-added-dialog.png)
+
+## ラベルとテキストボックスを追加する
+
+次にダイアログにラベルとテキストボックスを追加する。
