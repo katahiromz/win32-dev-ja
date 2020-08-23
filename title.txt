@@ -1,2 +1,4 @@
-﻿% 初心者向けC++/Win32プログラミング
-% 片山博文MZ
+﻿title: 初心者向けC++/Win32プログラミング
+author: 片山博文MZ
+rights: (C) 2020 片山博文MZ
+language: ja-JP
