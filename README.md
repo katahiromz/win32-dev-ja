@@ -1378,9 +1378,11 @@ add_executable(dialog WIN32 dialog.cpp dialog_res.rc)
 target_link_libraries(dialog PRIVATE comctl32)
 ```
 
-## メモ帳を作る
+## メモ帳を作る（notepad）
 
-それでは、もうちょっと冒険してメモ帳を作ってみよう。`c:\dev\cxx`に`notepad`というフォルダを作り、そこに`CMakeLists.txt`、`notepad.cpp`、`notepad_res.rc`を配置する。
+それでは、もうちょっと冒険してメモ帳を作ってみよう。
+今度はダイアログを使わないのでちょっとややこしくなる。
+`c:\dev\cxx`に`notepad`というフォルダを作り、そこに`CMakeLists.txt`、`notepad.cpp`、`notepad_res.rc`を配置する。
 
 `CMakeLists.txt`は次のような内容である。
 
@@ -1645,7 +1647,10 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 
 `GetClientRect`関数でタイトルバーや枠線を除いたクライアント領域の長方形（`RECT`構造体）を取得する。
 
-次に`CreateWindowEx`関数で`EDIT`コントロールを作成する。`CreateWindowEx`関数は`CreateWindow`を拡張した関数で、拡張スタイルを指定できる。`WS_EX_CLIENTEDGE`はへこんだ枠線を描画する拡張スタイルである。`ES_MULTILINE | ES_WANTRETURN | WS_CHILD | WS_VISIBLE`は`EDIT`コントロールのスタイルである。`ES_MULTILINE`スタイルは複数行を意味する。`WS_CHILD`スタイルは、子ウィンドウであることを意味する。`WS_VISIBLE`スタイルはすぐに表示することを意味する。
+次に`CreateWindowEx`関数で`EDIT`コントロールを作成する。`CreateWindowEx`関数は`CreateWindow`を拡張した関数で、拡張スタイルを指定できる。
+`WS_EX_CLIENTEDGE`はへこんだ枠線を描画する拡張スタイルである。`ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE`は`EDIT`コントロールのスタイルである。
+`ES_MULTILINE`スタイルは複数行を意味する。`WS_CHILD`スタイルは、子ウィンドウであることを意味する。`WS_VISIBLE`スタイルはすぐに表示することを意味する。
+`WS_HSCROLL`と`WS_VSCROLL`スタイルはスクロールバーの表示を表している。
 
 `CreateWindowEx`が失敗すれば、`OnCreate`は`FALSE`を返す。このとき親のメインウィンドウの作成は失敗する。
 
