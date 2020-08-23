@@ -63,7 +63,7 @@ Windowsではファイル名には大文字小文字の区別がないが、他�
 
 拡張子は半角でなければならない。Windowsでは拡張子がファイルの種類を区別している。拡張子が1字でも違うとファイルが開かないことがある。
 
-[https://ja.wikipedia.org/wiki/拡張子](https://ja.wikipedia.org/wiki/%E6%8B%A1%E5%BC%B5%E5%AD%90)
+- [https://ja.wikipedia.org/wiki/拡張子](https://ja.wikipedia.org/wiki/%E6%8B%A1%E5%BC%B5%E5%AD%90)
 
 拡張子が見えなければ、Windowsで拡張子が見える設定にしないといけない。開発現場では拡張子表示は必須。
 
@@ -143,7 +143,7 @@ Windowsで実行したプログラムは、「プロセス」という単位で�
 
 では早速、Windows版のReactOS Build Environment (RosBE) をインストールしてみよう。次のリンクからWindows版のRosBEを選択すれば、ダウンロードできる。
 
-- [https://reactos.org/wiki/Build_Environment](https://reactos.org/wiki/Build_Environment)
+- RosBE [https://reactos.org/wiki/Build_Environment](https://reactos.org/wiki/Build_Environment)
 
 ダウンロードに成功したらインストールしよう。ファイルアイコンをダブルクリックすれば、インストールが始まる。
 
@@ -336,11 +336,15 @@ ninja
 
 この文書ではリソースエディタとして「リソーエディタ」（RisohEditor）を使用する。次のリンクからリソーエディタをダウンロード＆インストールして下さい。
 
-- [リソーエディタ https://katahiromz.web.fc2.com/re/ja/](https://katahiromz.web.fc2.com/re/ja/)
+- リソーエディタ [https://katahiromz.web.fc2.com/re/ja/](https://katahiromz.web.fc2.com/re/ja/)
 
 リソーエディタをインストールすれば、次のようなアイコンがデスクトップに作成される。
 
 ![リソーエディタ](images/RisohEditor.png)
+
+リソーエディタの詳しい使い方については、次のまとめサイトを参照されたい。
+
+- まとめサイト [https://katahiromz.web.fc2.com/colony3rd/risoheditor/](https://katahiromz.web.fc2.com/colony3rd/risoheditor/)
 
 ## 初めてのダイアログアプリ（dialog.cpp）
 
@@ -389,11 +393,13 @@ WinMain(HINSTANCE   hInstance,
 ```
 
 急にプログラムがややこしくなったが、１つ１つ理解していけば問題ない。
-`#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。ダイアログプロシージャは典型的なイベント駆動型プログラミングを実装する。
+`#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。ダイアログプロシージャは典型的なイベント駆動型プログラミングを実装する。`WM_INITDIALOG`メッセージはダイアログの初期化のときに発生する。`WM_COMMAND`メッセージはダイアログでコマンドが発生したとき（ボタンが押されたときなど）に発生する。
 
 ここでは、main関数の代わりに`WinMain`という関数を使う。main関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不必要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。
 
-開発が進むにつれて、複雑なコードを無数に入力するはめになるが、`WinMain`や`DialogProc`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。
+開発が進むにつれて、複雑なコードを何度も入力するはめになるが、`WinMain`や`DialogProc`などのよく使うコードは、コピーしたり、テンプレートを使ったり、マクロなどで自動入力すれば問題ない。入力補助として`MsgCrack`というソフトがあるので活用されたい。
+
+- MsgCrack [https://katahiromz.web.fc2.com/msgcrack/ja/](https://katahiromz.web.fc2.com/msgcrack/ja/)
 
 次はリソースファイルである。リソーエディタで以下の手順に従って`dialog_res.rc`ファイルを作成する。`dialog_res`の下線（`_`）は、`Shift`キーを押しながら「`ろ`」で入力する。名前に`_res`を付けたのはオブジェクトファイルの名前を衝突させないためである。
 
@@ -458,7 +464,7 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 「OK」や「キャンセル」を押したら`EndDialog`関数でダイアログを終了するだけだ。
 
-## 「OK」ボタンの処理を追加する。
+## 「OK」ボタンの処理を追加する
 
 `EndDialog`の呼び出しの前に処理を追加すれば、ボタンを押したときに何か処理を行うことができる。例えば、「OK」ボタンを押したときに、`test.txt`というテキストファイルを作成するプログラムに改造してみよう。`WM_COMMAND`メッセージのプロシージャの`OnCommand`関数を次のように改造し、`OnOK`関数を追加する。
 
@@ -650,6 +656,7 @@ FONT 9, "MS UI Gothic"
 // RT_GROUP_ICON
 
 1 ICON "res/1041_Icon_1.ico"
+
 ...(以下略)...
 ```
 
@@ -658,30 +665,31 @@ FONT 9, "MS UI Gothic"
 
 次にダイアログにラベルとテキストボックスを追加・配置する。
 
-1. リソーエディタで`dialog_res.rc`を開く。
-2. `RT_DIALOG`→`1`→`日本語`を選択し、ダブルクリックする。「ダイアログの編集」が開かれる。
+リソーエディタで`dialog_res.rc`を開く。`RT_DIALOG`→`1`→`日本語`を選択し、ダブルクリックする。「ダイアログの編集」が開かれる。
 
 ![ダイアログの編集](images/dialog-edit.png)
 
-3．ラベルを追加する。右クリックして「コントロールの追加」を選ぶ。
+ラベルを追加する。右クリックして「コントロールの追加」を選ぶ。
 
 ![ラベルの追加](images/ltext.png)
 
-4. 「定義済みControl:」に`LTEXT`を選択する。「キャプション:」に「整数:」と入力する。「ID:」に「stc1」と入力する。「OK」ボタンを押す。
-5. ラベル「整数:」が追加されるのでサイズと位置を調整する。
+「定義済みControl:」に`LTEXT`と入力する。「キャプション:」に「整数:」と入力する。「ID:」に「`stc1`」と入力する。「OK」ボタンを押す。
+
+ラベル「整数:」が追加されるのでサイズと位置を調整する。
 
 ![ラベルの追加2](images/label-added.png)
 
-6. 次にテキストボックスを追加する。右クリックして「コントロールの追加」を選ぶ。
+次にテキストボックスを追加する。右クリックして「コントロールの追加」を選ぶ。
 
 ![テキストボックスの追加](images/edittext.png)
 
-7. 「定義済みControl:」に「EDITTEXT」と入力し、「ID:」に「edt1」と入力する。「OK」ボタンを押す。
-8. ボタンが追加される。位置とサイズを調整する。
+「定義済みControl:」に「EDITTEXT」と入力し、「ID:」に「edt1」と入力する。「OK」ボタンを押す。
+
+ボタンが追加される。位置とサイズを調整する。
 
 ![テキストボックスの追加2](images/textbox-added.png)
 
-9. 「ダイアログの編集」を閉じ、変更内容を上書き保存する。
+「ダイアログの編集」を閉じ、変更内容を上書き保存する。
 
 これでラベル（`LTEXT`）とテキストボックス（`EDITTEXT`）を追加できた。`ninja`を再び実行してビルドしよう。
 
@@ -722,6 +730,7 @@ FONT 9, "MS UI Gothic"
 // RT_GROUP_ICON
 
 1 ICON "res/1041_Icon_1.ico"
+
 ...(以下略)...
 ```
 
@@ -859,7 +868,7 @@ FONT 9, "MS UI Gothic"
 {
     DEFPUSHBUTTON "OK", IDOK, 35, 115, 60, 14
     PUSHBUTTON "キャンセル", IDCANCEL, 115, 115, 60, 14
-    LTEXT "整数:", -1, 17, 17, 29, 14
+    LTEXT "整数:", stc1, 17, 17, 29, 14
     EDITTEXT edt1, 57, 17, 60, 14
 }
 
@@ -871,8 +880,54 @@ FONT 9, "MS UI Gothic"
 ...(以下略)...
 ```
 
-## ここまでの開発を振り返る
+## キーボード操作を考慮する
 
-さて、Win32プログラミングをここまでやってみたが、どうだろうか。実際の開発でも「少し変更して、実行して、テストする」を繰り返すことが多い。リファレンスを呼んでどんなAPI関数があるかを研究すると、実際のWin32開発でも役立つと思われる。
+ダイアログを開いて`Tab`キーを何度か押してみよう。
 
-インターネットやGitHubにも様々な役立つ情報が掲載されているはずである。是非、研究を続けていってほしい。
+![フォーカス1](images/focus-1.png)
+![フォーカス2](images/focus-2.png)
+![フォーカス3](images/focus-3.png)
+
+見ればわかるように、`Tab`キーは「キーボード フォーカス」というものを移動させる。フォーカスというのは、現在のキーボード操作対象のコントロールのことである。最初は「OK」ボタンにフォーカスがある。次は「キャンセル」ボタンにフォーカスが移る。最後にテキストボックスにフォーカスが移る。もう一度`Tab`キーを押すと「OK」ボタンに戻る。
+
+テキストボックスはフォーカスがないと入力できない。最初にテキストボックスにフォーカスがある方がユーザーにとって親切だろう。そこで、コントロールの順序を次のように変えて、上書き保存する。
+
+```rc
+1 DIALOG 0, 0, 215, 135
+CAPTION "サンプル ダイアログ"
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+FONT 9, "MS UI Gothic"
+{
+    LTEXT "整数:", stc1, 17, 17, 29, 14
+    EDITTEXT edt1, 57, 17, 60, 14
+    DEFPUSHBUTTON "OK", IDOK, 35, 115, 60, 14
+    PUSHBUTTON "キャンセル", IDCANCEL, 115, 115, 60, 14
+}
+```
+
+これで`WM_INITDIALOG`メッセージで`TRUE`を返すと、自動的にedt1にフォーカスが当たるようになる。`ninja`を実行してもう一度試してみよう。
+
+![フォーカス4](images/focus-4.png)
+
+今度は、最初に`edt1`にフォーカスが当たる。これでダイアログを開いたらすぐに整数を入力できる。
+
+ダイアログを開いているときは、キーボードで`Enter`を押すと、デフォルトのボタン（`DEFPUSHBUTTON`）が押されるようになっている。`Esc`キーは「キャンセル」ボタン（`IDCANCEL`）と同じである。
+
+## 数字のみを受け付ける
+
+テキストボックスで数字のみ入力を許可し、それ以外の入力を禁止する場合は、`ES_NUMBER`スタイルを使うとよい。スタイルというのは、ウィンドウやコントロールの振る舞いを変えるものである。
+
+```rc
+1 DIALOG 0, 0, 215, 135
+CAPTION "サンプル ダイアログ"
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+FONT 9, "MS UI Gothic"
+{
+    LTEXT "整数:", stc1, 17, 17, 29, 14
+    EDITTEXT edt1, 57, 17, 60, 14, ES_NUMBER
+    DEFPUSHBUTTON "OK", IDOK, 35, 115, 60, 14
+    PUSHBUTTON "キャンセル", IDCANCEL, 115, 115, 60, 14
+}
+```
+
+`EDITTEXT`に「`, ES_NUMBER`」を追記して上書き保存する。`ninja`を実行。これで数字以外を入力できなくなった。
