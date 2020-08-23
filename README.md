@@ -1630,7 +1630,8 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL |
+                  WS_CHILD | WS_VISIBLE;
     DWORD exstyle = WS_EX_CLIENTEDGE;
     HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
         rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
@@ -1694,7 +1695,8 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL |
+                  WS_CHILD | WS_VISIBLE;
     DWORD exstyle = WS_EX_CLIENTEDGE;
     HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
         rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
@@ -1982,7 +1984,8 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL |
+                  WS_CHILD | WS_VISIBLE;
     DWORD exstyle = WS_EX_CLIENTEDGE;
     HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
         rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
@@ -2446,7 +2449,8 @@ BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
     RECT rc;
     GetClientRect(hwnd, &rc);
 
-    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL |
+                  WS_CHILD | WS_VISIBLE;
     DWORD exstyle = WS_EX_CLIENTEDGE;
     HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
         rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
