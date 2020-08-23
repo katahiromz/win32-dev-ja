@@ -16,7 +16,9 @@
 
 パソコンの使い方が分からなければ、パソコン関係の本を調べる。Windowsを知らなければWindowsの本を調べる。
 
-単語がわからなかったらGoogleで調べる。https://google.co.jp
+単語がわからなかったらGoogleで調べる。
+
+- Google [https://google.co.jp](https://google.co.jp)
 
 漢字がわからなかったら漢和辞典を見る。
 
