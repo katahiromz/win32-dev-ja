@@ -1377,7 +1377,7 @@ add_executable(dialog WIN32 dialog.cpp dialog_res.rc)
 target_link_libraries(dialog PRIVATE comctl32)
 ```
 
-# メモ帳を作る（notepad）
+# メモ帳を作る（notepad.cpp）
 
 それでは、もう少し冒険してメモ帳を作ってみよう。
 今度はダイアログアプリではない、普通のウィンドウアプリなので少しややこしくなる。
@@ -3016,6 +3016,550 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
 target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 ```
+
+# お絵かきソフトを作る（paint）
+
+次はお絵かきソフトを作ろう。マウスでお絵かき楽しいな。
+
+## 初期のソース
+
+最初にヘッダファイル`paint.h`。
+
+```cpp
+#pragma once
+
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <cstdio>
+#include <string>
+#include "resource.h"
+
+LPTSTR LoadStringDx(INT nID);
+
+LRESULT CALLBACK
+CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+```
+
+次にソース（paint.cpp）。
+
+```cpp
+#include "paint.h"
+
+static const TCHAR s_szName[] = TEXT("My Paint");
+static const TCHAR s_szCanvasName[] = TEXT("My Paint Canvas");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+static HWND s_hCanvasWnd = NULL;
+
+LPTSTR LoadStringDx(INT nID)
+{
+    static UINT s_index = 0;
+    const UINT cchBuffMax = 1024;
+    static TCHAR s_sz[4][cchBuffMax];
+
+    TCHAR *pszBuff = s_sz[s_index];
+    s_index = (s_index + 1) % _countof(s_sz);
+    pszBuff[0] = 0;
+    ::LoadString(NULL, nID, pszBuff, cchBuffMax);
+    return pszBuff;
+}
+
+static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hCanvas = CreateWindowEx(exstyle, s_szCanvasName, s_szCanvasName, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)ctl1, s_hInst, NULL);
+    if (hCanvas == NULL)
+        return FALSE;
+
+    s_hCanvasWnd = hCanvas;
+    DragAcceptFiles(hwnd, TRUE);
+
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    MoveWindow(s_hCanvasWnd, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    MessageBox(hwnd, LoadStringDx(101), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+static void OnOpen(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("bmp");
+    if (GetOpenFileName(&ofn))
+    {
+        DoLoad(hwnd, szFile);
+    }
+}
+
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    MessageBox(hwnd, LoadStringDx(100), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+static void OnSave(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("bmp");
+    if (GetSaveFileName(&ofn))
+    {
+        DoSave(hwnd, szFile);
+    }
+}
+
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case ID_OPEN:
+        OnOpen(hwnd);
+        break;
+    case ID_SAVE:
+        OnSave(hwnd);
+        break;
+    case ID_EXIT:
+        DestroyWindow(hwnd);
+        break;
+    case ID_CUT:
+    case ID_COPY:
+    case ID_PASTE:
+    case ID_DELETE:
+    case ID_SELECT_ALL:
+        SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
+        break;
+    }
+}
+
+static void OnDropFiles(HWND hwnd, HDROP hdrop)
+{
+    TCHAR szPath[MAX_PATH];
+
+    DragQueryFile(hdrop, 0, szPath, MAX_PATH);
+    DragFinish(hdrop);
+
+    DoLoad(hwnd, szPath);
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_DROPFILES, OnDropFiles);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+    InitCommonControls();
+
+    WNDCLASS wc;
+
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = MAKEINTRESOURCE(1);
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+    wc.lpfnWndProc = CanvasWndProc;
+    wc.hInstance = hInstance;
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = GetStockBrush(GRAY_BRUSH);
+    wc.lpszClassName = s_szCanvasName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -3;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(1));
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        if (TranslateAccelerator(s_hMainWnd, hAccel, &msg))
+            continue;
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    DestroyAcceleratorTable(hAccel);
+
+    return 0;
+}
+```
+
+次は`canvas.cpp`。
+
+```cpp
+#include "paint.h"
+
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case ID_CUT:
+        // TODO:
+        break;
+    case ID_COPY:
+        // TODO:
+        break;
+    case ID_PASTE:
+        // TODO:
+        break;
+    case ID_DELETE:
+        // TODO:
+        break;
+    case ID_SELECT_ALL:
+        // TODO:
+        break;
+    }
+}
+
+LRESULT CALLBACK
+CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+```
+
+お次は`resource.h`。
+
+```cpp
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ Compatible
+// This file is automatically generated by RisohEditor.
+// paint_res.rc
+
+#define ID_OPEN                             100
+#define ID_SAVE                             101
+#define ID_EXIT                             102
+#define ID_CUT                              103
+#define ID_COPY                             104
+#define ID_PASTE                            105
+#define ID_DELETE                           106
+#define ID_SELECT_ALL                       107
+
+#ifdef APSTUDIO_INVOKED
+    #ifndef APSTUDIO_READONLY_SYMBOLS
+        #define _APS_NO_MFC                 1
+        #define _APS_NEXT_RESOURCE_VALUE    100
+        #define _APS_NEXT_COMMAND_VALUE     110
+        #define _APS_NEXT_CONTROL_VALUE     1000
+        #define _APS_NEXT_SYMED_VALUE       300
+    #endif
+#endif
+```
+
+お次は`CMakeLists.txt`。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(paint C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(paint WIN32 paint.cpp canvas.cpp paint_res.rc)
+target_link_libraries(paint PRIVATE comctl32 comdlg32)
+```
+
+最後に`paint_res.rc`。
+
+```rc
+// paint_res.rc
+// This file is automatically generated by RisohEditor.
+// † <-- This dagger helps UTF-8 detection.
+
+#include "resource.h"
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include <windows.h>
+#include <commctrl.h>
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#pragma code_page(65001) // UTF-8
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MENU
+
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    {
+        MENUITEM "開く(&O)...\tCtrl+O", ID_OPEN
+        MENUITEM "名前を付けて保存(&S)...\tCtrl+S", ID_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)\tAlt+F4", ID_EXIT
+    }
+    POPUP "編集(&E)"
+    {
+        MENUITEM "切り取り(&T)\tCtrl+X", ID_CUT
+        MENUITEM "コピー(&C)\tCtrl+C", ID_COPY
+        MENUITEM "貼り付け(&P)\tCtrl+V", ID_PASTE
+        MENUITEM "削除(&D)\tDel", ID_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "すべて選択(&A)\tCtrl+A", ID_SELECT_ALL
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_ACCELERATOR
+
+1 ACCELERATORS
+{
+    "O", ID_OPEN, CONTROL, VIRTKEY
+    "S", ID_SAVE, CONTROL, VIRTKEY
+    "X", ID_CUT, CONTROL, VIRTKEY
+    "C", ID_COPY, CONTROL, VIRTKEY
+    "V", ID_PASTE, CONTROL, VIRTKEY
+    VK_DELETE, ID_DELETE, CONTROL, VIRTKEY
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1041_Icon_1.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MANIFEST
+
+#ifndef MSVC
+1 24 "res/1041_Manifest_1.manifest"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_STRING
+
+STRINGTABLE
+{
+    100, "ファイルの保存に失敗しました。"
+    101, "ファイルを開くのに失敗しました。"
+}
+
+...(以下略)...
+```
+
+## 実行してみる
+
+```cmd
+cmake -G "Ninja" .
+ninja
+paint
+```
+
+次のようなウィンドウが開かれる。
+
+![ペイントの初期](images/paint-initial.png)\
+
+## ソースの解説
+
+`WinMain`関数で２つのウィンドウクラスを登録している。
+一つはメインウィンドウ、もう一つはキャンバス用の子ウィンドウ。
+
+```cpp
+    wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+```
+
+この `CS_HREDRAW | CS_VREDRAW` は、「サイズ変更されたら再描画せよ」という意味である。
+`CS_DBLCLKS`は「ダブルクリックを認識せよ」という意味である。
+
+```cpp
+    wc.lpfnWndProc = CanvasWndProc;
+```
+
+ここの`CanvasWndProc`は、キャンバスのウィンドウプロシージャであり、
+ヘッダで宣言され、`canvas.c`で定義されている。
+
+```cpp
+    wc.hbrBackground = GetStockBrush(GRAY_BRUSH);
+```
+
+この`hbrBackground`は、背景を塗りつぶすブラシであり、ここでは灰色を選んでいる。
+
+続いて
+`OnCreate`、
+`OnDestroy`、
+`OnSize`、
+`OnCommand`、
+`OnDropFiles`、
+`WindowProc`
+については、前回とほとんど同じで、解説は要らないだろう。
+
+## ビットマップとは
+
+ビットマップとは、画像のイメージをピクセル（画素）で記録した、Windowsの基本的な画像データである。
+ビットマップ ファイルというのは、拡張子`.bmp`のビットマップの画像ファイルのことである。
+ビットマップ オブジェクトというのは、ファイルになっていない、メモリー上の画像データである。
+
+ビットマップ オブジェクトは次のようにすれば作成できる。
+
+```cpp
+HBITMAP DoCreate24BppBitmap(INT cx, INT cy)
+{
+    BITMAPINFO bmi;
+    ZeroMemory(&bmi, sizeof(bmi));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = cx;
+    bmi.bmiHeader.biHeight = cy;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 24;
+
+    HDC hDC = CreateCompatibleDC(NULL);
+    LPVOID pvBits;
+    HBITMAP ret = CreateDIBSection(hDC, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0);
+    DeleteDC(hDC);
+    return ret;
+}
+```
+
+この関数は、幅`cx`、高さ`cy`の24bppのビットマップ オブジェクトを作成する。
+24bppというのは24 bits per pixel、すなわち１ピクセルに24ビットを消費するフルカラーのビットマップ画像のことである。
+
+`DoCreate24BppBitmap`という関数名に`Do`（ドゥ）が付いているのは、
+`Do`から始まるAPI関数は「ない」から、API関数と区別しやすいからである。
+
+## キャンバスの初期実装
+
+次のコードにより、キャンバスのウィンドウハンドルにビットマップのハンドルを関連付ける。
+
+```cpp
+static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    HBITMAP hbm = DoCreate24BppBitmap(320, 120);
+    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)hbm);
+    return TRUE;
+}
+```
+
+`Get/SetWindowLongPtr`関数の`GWLP_USERDATA`を使えば、ウィンドウハンドルに
+任意のポインタを関連付けることができる。
+
+ビットマップを作成したら後で破棄しないといけない。キャンバスウィンドウの`WM_DESTROY`で破棄する。
+
+```
+static void OnDestroy(HWND hwnd)
+{
+    HBITMAP hbm = (HBITMAP)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    DeleteObject(hbm);
+}
+```
+
+次は、ビットマップを画面に描画する。キャンバスウィンドウの`WM_PAINT`で次のように
+描画する。
+
+```cpp
+static void OnPaint(HWND hwnd)
+{
+    HBITMAP hbm = (HBITMAP)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    BITMAP bm;
+    GetObject(hbm, sizeof(bm), &bm);
+
+    PAINTSTRUCT ps;
+    if (HDC hDC = BeginPaint(hwnd, &ps))
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, hbm);
+            BitBlt(hDC, 0, 0, bm.bmWidth, bm.bmHeight,
+                   hMemDC, 0, 0, SRCCOPY);
+            SelectBitmap(hMemDC, hbmOld);
+
+            DeleteDC(hMemDC);
+        }
+        EndPaint(hwnd, &ps);
+    }
+}
+```
+
+`WM_PAINT`の処理で描画を行うときは、描画コードを`BeginPaint`と`EndPaint`で挟み込む。
+`BeginPaint`は、`HDC`（デバイス コンテキストのハンドル）を返す。これをうまく使えば、ウィンドウに描画することができる。
+`CreateCompatibleDC(NULL)`はもう一つ別のデバイス コンテキスト（DC）を返す。これはメモリー上のDCである。
+`CreateCompatibleDC(NULL)`を呼んだら、後でその戻り値を`DeleteDC`で破棄しないといけない。
+`hMemDC`でビットマップのハンドル（`hbm`）を選択して、`BitBlt`でビット群を`hDC`に転送すれば、
+ビットイメージが`hDC`に転送される。これが画面への描画を引き起こす。
+
+`ninja`して確認しよう。
+
+![ペイントで黒い画像](images/paint-black.png)\
+
+横320x縦120ピクセルの黒い画像が表示されているのが分かる。
 
 # 大規模開発のテクニック
 
