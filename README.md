@@ -701,6 +701,7 @@ FONT 9, "MS UI Gothic"
 「ダイアログの編集」を閉じ、変更内容を上書き保存する。
 
 これでラベル（`LTEXT`）とテキストボックス（`EDITTEXT`）を追加できた。`ninja`を再び実行してビルドしよう。
+ビルドに成功したら、`dialog.exe`を実行してみよう。
 
 ![追加に成功](images/controls-added.png)\
 
