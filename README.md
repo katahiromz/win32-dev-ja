@@ -462,7 +462,11 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 ![dialogのビルド](images/dialog-build.png)\
 
-一行ずつ解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。リソースをコンパイルするために、`dialog_res.rc`を追加した。`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。
+一行ずつ解説しよう。`CMakeLists.txt`の`add_executable`に`WIN32`があるのは、`main`関数を使わず、`WinMain`関数を使うためである。`WinMain`関数を使えば起動時に黒い画面は表示されない。
+リソースをコンパイルするために、`dialog_res.rc`を追加した。
+
+`target_link_libraries`については`dialog.exe`にリンクするDLLファイル`comctl32`を指定している。この`comctl32`については後述する。
+よく使うDLLファイルの`kernel32`と`user32`については明示的にリンクしなくても勝手にリンクされる。
 
 それでは`dialog.exe`を実行してみよう。次のような何の変哲もないダイアログが開かれるはずである。
 
@@ -2806,8 +2810,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 }
 ```
 
+多くの機能は、SendMessageでメッセージを送信するだけで利用可能だ。
 アクセスキーの`Ctrl+X`、`Ctrl+C`、`Ctrl+V`、`Del`、`Ctrl+A`については、
-すでに実装されているので追加しなくてもよい。
+EDITコントロールにすでに実装されているので追加しなくてもよい。
 
 `ninja`を実行してちゃんと動作するか確認しよう。
 
@@ -2830,7 +2835,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 `ID_DELETE`→`107`、
 `ID_SELECT_ALL`→`108`
 を追加する。
-6. 上書き保存する。
+6. 上書き保存する。`resource.h`というファイルが作成される。
 7. `notepad.cpp`の上の方に`#include "resource.h"`を追記する。
 8. 次のように`OnCommand`のコマンドIDをすべて識別子に直す。
 
@@ -2873,6 +2878,452 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 ```
 
 これでコマンドIDがだいぶ分かりやすくなった。
+
+## メモ帳に日時挿入の機能を追加する
+
+メモ帳に日時を表す文字列を挿入する機能を追加してみよう。
+
+1. リソーエディタで`notepad_res.rc`を開く。
+2. 次に、「表示」メニューから「リソースIDの一覧」を選ぶ。「リソースIDの一覧」ウィンドウが開かれる。
+3. 「リソースIDの一覧」の中を右クリックして、「追加...」を選ぶ。「リソースIDの追加」ダイアログが開かれる。
+4. 「IDの名前」に「`ID_INSERT_DATETIME`」と入力した後、「AUTO」ボタンを押してから「OK」ボタンを押す。これで「`ID_INSERT_DATETIME`」というコマンドIDが追加される。
+5. 「編集」メニューに「日時の挿入(&I)」というメニュー項目を`ID_INSERT_DATETIME`というコマンドIDで追加する。
+6. 上書き保存する。
+7. `ID_INSERT_DATETIME`について次のようにコードを追記する。
+
+```cpp
+void OnInsertDateTime(HWND hwnd)
+{
+    TCHAR szText[64];
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    wsprintf(szText, TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
+             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)szText);
+}
+
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    switch (id)
+    {
+    ...(中略)...
+    case ID_SELECT_ALL:
+        SendMessage(hEdit, EM_SETSEL, 0, -1);
+        break;
+    case ID_INSERT_DATETIME:
+        OnInsertDateTime(hwnd);
+        break;
+    }
+}
+```
+
+これでメニュー項目を選べば、現在の日時を挿入できる。
+
+## まとめ
+
+ここまでのソースコードをまとめとこう。
+
+まず、ソース（`notepad.cpp`）。
+
+```cpp
+#include <windows.h>
+#include <windowsx.h>
+#include <commctrl.h>
+#include <commdlg.h>
+#include <cstdio>
+#include <string>
+#include "resource.h"
+
+static const TCHAR s_szName[] = TEXT("My Notepad");
+
+static HINSTANCE s_hInst = NULL;
+static HWND s_hMainWnd = NULL;
+static HFONT s_hFont = NULL;
+
+LPWSTR LoadStringDx(INT nID)
+{
+    static UINT s_index = 0;
+    const UINT cchBuffMax = 1024;
+    static WCHAR s_sz[4][cchBuffMax];
+
+    WCHAR *pszBuff = s_sz[s_index];
+    s_index = (s_index + 1) % _countof(s_sz);
+    pszBuff[0] = 0;
+    ::LoadStringW(NULL, nID, pszBuff, cchBuffMax);
+    return pszBuff;
+}
+
+BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    DWORD style = ES_MULTILINE | ES_WANTRETURN | WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE;
+    DWORD exstyle = WS_EX_CLIENTEDGE;
+    HWND hEdit = CreateWindowEx(exstyle, L"EDIT", NULL, style,
+        rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top,
+        hwnd, (HMENU)(INT_PTR)edt1, s_hInst, NULL);
+    if (hEdit == NULL)
+        return FALSE;
+
+    DragAcceptFiles(hwnd, TRUE);
+
+    LOGFONT lf = { -14 };
+    lf.lfPitchAndFamily = FIXED_PITCH | FF_MODERN;
+    lf.lfCharSet = SHIFTJIS_CHARSET;
+    s_hFont = CreateFontIndirect(&lf);
+
+    SetWindowFont(hEdit, s_hFont, TRUE);
+
+    return TRUE;
+}
+
+void OnDestroy(HWND hwnd)
+{
+    PostQuitMessage(0);
+}
+
+void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    MoveWindow(hEdit, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, TRUE);
+}
+
+BOOL DoLoad(HWND hwnd, LPCTSTR pszFile)
+{
+    std::string str;
+    char buf[256];
+    if (FILE *fp = _wfopen(pszFile, L"rb"))
+    {
+        while (fgets(buf, 256, fp))
+        {
+            str += buf;
+        }
+        fclose(fp);
+
+        if (SetDlgItemTextA(hwnd, edt1, str.c_str()))
+        {
+            return TRUE;
+        }
+    }
+    MessageBox(hwnd, LoadStringDx(101), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+void OnOpen(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetOpenFileName(&ofn))
+    {
+        DoLoad(hwnd, szFile);
+    }
+}
+
+BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    INT cch = GetWindowTextLengthA(hEdit);
+
+    std::string str;
+    str.resize(cch);
+    GetWindowTextA(hEdit, &str[0], cch + 1);
+
+    if (FILE *fp = _wfopen(pszFile, L"wb"))
+    {
+        size_t written = fwrite(str.c_str(), str.size(), 1, fp);
+        fclose(fp);
+        if (written > 0)
+            return TRUE;
+    }
+
+    MessageBox(hwnd, LoadStringDx(100), NULL, MB_ICONERROR);
+    return FALSE;
+}
+
+void OnSave(HWND hwnd)
+{
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400 };
+    ofn.hwndOwner = hwnd;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = MAX_PATH;
+    ofn.Flags = OFN_EXPLORER | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST |
+                OFN_HIDEREADONLY | OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("txt");
+    if (GetSaveFileName(&ofn))
+    {
+        DoSave(hwnd, szFile);
+    }
+}
+
+void OnInsertDateTime(HWND hwnd)
+{
+    TCHAR szText[64];
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    wsprintf(szText, TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
+             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+    SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)szText);
+}
+
+void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    HWND hEdit = GetDlgItem(hwnd, edt1);
+
+    switch (id)
+    {
+    case ID_OPEN:
+        OnOpen(hwnd);
+        break;
+    case ID_SAVE:
+        OnSave(hwnd);
+        break;
+    case ID_EXIT:
+        DestroyWindow(hwnd);
+        break;
+    case ID_UNDO:
+        SendMessage(hEdit, EM_UNDO, 0, 0);
+        break;
+    case ID_CUT:
+        SendMessage(hEdit, WM_CUT, 0, 0);
+        break;
+    case ID_COPY:
+        SendMessage(hEdit, WM_COPY, 0, 0);
+        break;
+    case ID_PASTE:
+        SendMessage(hEdit, WM_PASTE, 0, 0);
+        break;
+    case ID_DELETE:
+        SendMessage(hEdit, WM_CLEAR, 0, 0);
+        break;
+    case ID_SELECT_ALL:
+        SendMessage(hEdit, EM_SETSEL, 0, -1);
+        break;
+    case ID_INSERT_DATETIME:
+        OnInsertDateTime(hwnd);
+        break;
+    }
+}
+
+void OnDropFiles(HWND hwnd, HDROP hdrop)
+{
+    TCHAR szPath[MAX_PATH];
+
+    DragQueryFile(hdrop, 0, szPath, MAX_PATH);
+    DragFinish(hdrop);
+
+    DoLoad(hwnd, szPath);
+}
+
+void OnActivate(HWND hwnd, UINT state, HWND hwndActDeact, BOOL fMinimized)
+{
+    SetFocus(GetDlgItem(hwnd, edt1));
+}
+
+LRESULT CALLBACK
+WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_DROPFILES, OnDropFiles);
+        HANDLE_MSG(hwnd, WM_ACTIVATE, OnActivate);
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+INT WINAPI
+WinMain(HINSTANCE   hInstance,
+        HINSTANCE   hPrevInstance,
+        LPSTR       lpCmdLine,
+        INT         nCmdShow)
+{
+    s_hInst = hInstance;
+
+    WNDCLASS wc;
+    ZeroMemory(&wc, sizeof(wc));
+    wc.style = 0;
+    wc.lpfnWndProc = WindowProc;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(1));
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
+    wc.lpszMenuName = MAKEINTRESOURCE(1);
+    wc.lpszClassName = s_szName;
+    if (!RegisterClass(&wc))
+    {
+        MessageBoxA(NULL, "RegisterClass failed", NULL, MB_ICONERROR);
+        return -1;
+    }
+
+    s_hMainWnd = CreateWindow(s_szName, s_szName, WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+        NULL, NULL, hInstance, NULL);
+    if (!s_hMainWnd)
+    {
+        MessageBoxA(NULL, "CreateWindow failed", NULL, MB_ICONERROR);
+        return -2;
+    }
+
+    ShowWindow(s_hMainWnd, nCmdShow);
+    UpdateWindow(s_hMainWnd);
+
+    HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(1));
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        if (TranslateAccelerator(s_hMainWnd, hAccel, &msg))
+            continue;
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    DestroyAcceleratorTable(hAccel);
+    DeleteObject(s_hFont);
+
+    return 0;
+}
+```
+
+次はリソース（`notepad_res.rc`）。
+
+```rc
+// notepad_res.rc
+// This file is automatically generated by RisohEditor.
+// † <-- This dagger helps UTF-8 detection.
+
+#include "resource.h"
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include <windows.h>
+#include <commctrl.h>
+#undef APSTUDIO_HIDDEN_SYMBOLS
+#pragma code_page(65001) // UTF-8
+
+//////////////////////////////////////////////////////////////////////////////
+
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MENU
+
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    {
+        MENUITEM "開く(&O)...\tCtrl+O", ID_OPEN
+        MENUITEM "名前を付けて保存(&S)...\tCtrl+S", ID_SAVE
+        MENUITEM SEPARATOR
+        MENUITEM "終了(&X)\tAlt+F4", ID_EXIT
+    }
+    POPUP "編集(&E)"
+    {
+        MENUITEM "元に戻す(&U)\tCtrl+Z", ID_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "切り取り(&T)\tCtrl+X", ID_CUT
+        MENUITEM "コピー(&C)\tCtrl+C", ID_COPY
+        MENUITEM "貼り付け(&P)\tCtrl+V", ID_PASTE
+        MENUITEM "削除(&D)\tDel", ID_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "すべて選択(&A)\tCtrl+A", ID_SELECT_ALL
+        MENUITEM "日時の挿入(&I)", ID_INSERT_DATETIME
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_ACCELERATOR
+
+1 ACCELERATORS
+{
+    "O", ID_OPEN, CONTROL, VIRTKEY
+    "S", ID_SAVE, CONTROL, VIRTKEY
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1041_Icon_1.ico"
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_MANIFEST
+
+#ifndef MSVC
+1 24 "res/1041_Manifest_1.manifest"
+#endif
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_STRING
+
+STRINGTABLE
+{
+    100, "ファイルの保存に失敗しました。"
+    101, "ファイルを開くのに失敗しました。"
+}
+
+...(以下略)...
+```
+
+そして`resource.h`。
+
+```c
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ Compatible
+// This file is automatically generated by RisohEditor.
+// notepad_res.rc
+
+#define ID_OPEN                             100
+#define ID_SAVE                             101
+#define ID_EXIT                             102
+#define ID_UNDO                             103
+#define ID_CUT                              104
+#define ID_COPY                             105
+#define ID_PASTE                            106
+#define ID_DELETE                           107
+#define ID_SELECT_ALL                       108
+#define ID_INSERT_DATETIME                  109
+
+#ifdef APSTUDIO_INVOKED
+    #ifndef APSTUDIO_READONLY_SYMBOLS
+        #define _APS_NO_MFC                 1
+        #define _APS_NEXT_RESOURCE_VALUE    100
+        #define _APS_NEXT_COMMAND_VALUE     110
+        #define _APS_NEXT_CONTROL_VALUE     1000
+        #define _APS_NEXT_SYMED_VALUE       300
+    #endif
+#endif
+```
+
+最後に`CMakeLists.txt`。
+
+```txt
+cmake_minimum_required(VERSION 2.4)
+project(notepad C CXX RC)
+add_definitions(-DUNICODE -D_UNICODE)
+add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
+target_link_libraries(notepad PRIVATE comctl32 comdlg32)
+```
 
 # 結び
 
