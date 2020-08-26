@@ -2562,13 +2562,12 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 メモ帳に日時を表す文字列を挿入する機能を追加してみよう。
 
-1. リソーエディタで`notepad_res.rc`を開く。
-2. 次に、「表示」メニューから「リソースIDの一覧」を選ぶ。「リソースIDの一覧」ウィンドウが開かれる。
-3. 「リソースIDの一覧」の中を右クリックして、「追加...」を選ぶ。「リソースIDの追加」ダイアログが開かれる。
-4. 「IDの名前」に「`ID_INSERT_DATETIME`」と入力した後、「AUTO」ボタンを押してから「OK」ボタンを押す。これで「`ID_INSERT_DATETIME`」というコマンドIDが追加される。
-5. 「編集」メニューに「日時の挿入(&I)」というメニュー項目を`ID_INSERT_DATETIME`というコマンドIDで追加する。
-6. 上書き保存する。
-7. `ID_INSERT_DATETIME`について次のようにコードを追記する。
+1. リソーエディタで`notepad_res.rc`を開き、「リソースIDの一覧」ウィンドウを開く。
+2. 「リソースIDの一覧」の中を右クリックして、「追加...」を選ぶ。「リソースIDの追加」ダイアログが開かれる。
+3. 「IDの名前」に「`ID_INSERT_DATETIME`」と入力した後、「AUTO」ボタンを押してから「OK」ボタンを押す。これで「`ID_INSERT_DATETIME`」というコマンドIDが追加される。
+4. 「編集」メニューに「日時の挿入(&I)」というメニュー項目を`ID_INSERT_DATETIME`というコマンドIDで追加する。
+5. 上書き保存する。
+6. `ID_INSERT_DATETIME`について次のようにコードを追記する。
 
 ```cpp
 void OnInsertDateTime(HWND hwnd)
