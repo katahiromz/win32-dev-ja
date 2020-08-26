@@ -1588,7 +1588,9 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 ```
 
 `CreateWindow`関数で指定したウィンドウクラスのウィンドウを作成する。
-ウィンドウのスタイルは`WS_OVERLAPPEDWINDOW`スタイルである。`CW_USEDEFAULT`は、位置やサイズを指定しないという意味である。
+ウィンドウのスタイルは`WS_OVERLAPPEDWINDOW`スタイルである。
+
+作成時の位置やサイズはピクセル単位で指定できるが、`CW_USEDEFAULT`は特殊な値で、位置やサイズを指定しないという意味である。
 作成に失敗したら、これもメッセージボックスを表示して終了する。
 
 ```cpp
