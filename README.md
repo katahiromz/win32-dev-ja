@@ -3017,6 +3017,25 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 
 大規模開発に使えるテクニックをいくつか紹介する。
 
+## `assert`文
+
+プログラミングで特定の状態を仮定する場合は、
+`<cassert>`の`assert`文を使えば、動作確認を自動化することができる。
+`assert`の文法は次の通り。
+
+```cpp
+assert(条件式);
+```
+
+条件式が真ならば、何もしない。
+条件式が偽であれば、実行時エラーが発生して、プログラムの実行が停止して、エラーが起こった行を確認できる。
+
+`assert`の使用例を下に示す。
+
+```cpp
+assert(IsWindow(m_hwnd));
+```
+
 ## サブクラス化
 
 `<windowsx.h>`にある`SubclassWindow`マクロ関数を使えば、
@@ -3064,20 +3083,34 @@ C++のクラスを使って動的に作成した実体をウィンドウハン�
 class MWindow
 {
 public:
-    MWindow() : m_hwnd(NULL)
+    HWND m_hwnd;
+    WNDPROC m_fnOldProc;
+
+    MWindow() : m_hwnd(NULL), m_fnOldProc(NULL)
     {
     }
+
     ...
+
+    virtual LRESULT CALLBACK
+    DefProcDx(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        if (m_fnOldProc)
+            return ::CallWindowProc(m_fnOldProc, hwnd, uMsg, wParam, lParam);
+        else
+            return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
 
     virtual LRESULT CALLBACK
     WindowProcDx(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         switch (uMsg)
         {
+            HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
             HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
             ...
         default:
-            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+            return DefProcDx(hwnd, uMsg, wParam, lParam);
         }
         return 0;
     }
@@ -3092,6 +3125,7 @@ public:
         case WM_CREATE:
             pCS = (CREATESTRUCT *)lParam;
             this_ = (MWindow *)pCS->lpCreateStruct;
+            assert(this_ != NULL);
             this_->m_hwnd = hwnd;
             SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this_);
             return this_->WindowProcDx(hwnd, uMsg, wParam, lParam);
@@ -3104,7 +3138,7 @@ public:
 
     LPCTSTR GetWndClassName() const;
 
-    BOOL DoRegister()
+    BOOL RegisterDx()
     {
         WNDCLASS wc;
         ZeroMemory(&wc, sizeof(wc));
@@ -3114,42 +3148,33 @@ public:
         return !!RegisterClass(&wc);
     }
 
-    BOOL DoCreate(HWND hwndParent, LPCTSTR pszText = NULL)
+    BOOL CreateDx(HWND hwndParent, LPCTSTR pszText = NULL)
     {
-        DoRegister();
+        RegisterDx();
         ...
         CreateWindow(GetWndClassName(), pszText, ...
                      this);
         return m_hwnd != NULL;
     }
 
+    BOOL SubclassDx(HWND hwnd)
+    {
+        m_hwnd = hwnd;
+        m_fnOldProc = SubclassWindow(hwnd, WindowProc);
+        return m_fnOldProc != NULL;
+    }
+
 protected:
-    HWND m_hwnd;
+    BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+    {
+        ...
+    }
 
     void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     {
         ...
     }
 };
-```
-
-## `assert`文
-
-プログラミングで特定の状態を仮定する場合は、
-`<cassert>`の`assert`文を使えば、動作確認を自動化することができる。
-`assert`の文法は次の通り。
-
-```cpp
-assert(条件式);
-```
-
-条件式が真ならば、何もしない。
-条件式が偽であれば、実行時エラーが発生して、プログラムの実行が停止して、エラーが起こった行を確認できる。
-
-`assert`の使用例を下に示す。
-
-```cpp
-assert(IsWindow(m_hwnd));
 ```
 
 # 結び
