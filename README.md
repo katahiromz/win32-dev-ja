@@ -3040,8 +3040,6 @@ LPTSTR LoadStringDx(INT nID);
 
 LRESULT CALLBACK
 CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-extern HBITMAP g_hbm;
 ```
 
 次にソース（paint.cpp）。
@@ -3391,7 +3389,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
     "X", ID_CUT, CONTROL, VIRTKEY
     "C", ID_COPY, CONTROL, VIRTKEY
     "V", ID_PASTE, CONTROL, VIRTKEY
-    VK_DELETE, ID_DELETE, CONTROL, VIRTKEY
+    VK_DELETE, ID_DELETE, VIRTKEY
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -3504,6 +3502,14 @@ HBITMAP DoCreate24BppBitmap(INT cx, INT cy)
 ```cpp
 HBITMAP g_hbm = NULL;
 ```
+
+この`g_hbm`を他の場所でも使えるように`paint.h`に
+
+```cpp
+extern HBITMAP g_hbm;
+```
+
+と書き加える。
 
 次のコードにより、キャンバスウィンドウ作成時にビットマップを作成する。
 
@@ -3922,6 +3928,202 @@ BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
 
 これでビットマップの読み書きができるようになったはずだ。
 `ninja`して動作を確認しよう。
+
+## 選択モードについて
+
+選択したいときと、描画したいときを分けるために、「モード」というものを導入する。
+選択したいときは「選択モード」、線を描画したいときは「線描画モード」というように、
+モードによって動作を変更するようにしたい。
+
+そこでモード変数というものを追加する。`canvas.cpp`の最初の方に次を追記する。
+
+```cpp
+enum MODE
+{
+    MODE_SELECT,
+    MODE_DRAW
+};
+
+static MODE s_nMode = MODE_DRAW;
+...
+static POINT s_pt;
+
+void DoNormalizeRect(RECT *prc)
+{
+    if (prc->left > prc->right)
+        std::swap(prc->left, prc->right);
+    if (prc->top > prc->bottom)
+        std::swap(prc->top, prc->bottom);
+}
+```
+
+また、`OnPaint`、`OnMouseMove`と`OnLButtonUp`の動作をモードに合わせないといけない。
+
+`OnPaint`を次のようにする。
+
+```cpp
+static void OnPaint(HWND hwnd)
+{
+    BITMAP bm;
+    GetObject(g_hbm, sizeof(bm), &bm);
+
+    PAINTSTRUCT ps;
+    if (HDC hDC = BeginPaint(hwnd, &ps))
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            BitBlt(hDC, 0, 0, bm.bmWidth, bm.bmHeight,
+                   hMemDC, 0, 0, SRCCOPY);
+            SelectBitmap(hMemDC, hbmOld);
+
+            if (s_nMode == MODE_SELECT)
+            {
+                RECT rc = { s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y };
+                DoNormalizeRect(&rc);
+                DrawFocusRect(hDC, &rc);
+            }
+
+            DeleteDC(hMemDC);
+        }
+        EndPaint(hwnd, &ps);
+    }
+}
+```
+
+`OnMouseMove`を次のようにする。
+
+```cpp
+static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    if (s_nMode == MODE_DRAW)
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            MoveToEx(hMemDC, s_ptOld.x, s_ptOld.y, NULL);
+            LineTo(hMemDC, x, y);
+            SelectBitmap(hMemDC, hbmOld);
+            SelectPen(hMemDC, hPenOld);
+
+            DeleteDC(hMemDC);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+
+        s_ptOld = pt;
+    }
+    else
+    {
+        s_pt = pt;
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+}
+```
+
+`OnLButtonUp`を次のようにする。
+
+```cpp
+static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    if (s_nMode == MODE_DRAW)
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            MoveToEx(hMemDC, s_ptOld.x, s_ptOld.y, NULL);
+            LineTo(hMemDC, x, y);
+            SelectBitmap(hMemDC, hbmOld);
+            SelectPen(hMemDC, hPenOld);
+
+            DeleteDC(hMemDC);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+    }
+    else
+    {
+        s_pt = pt;
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    ReleaseCapture();
+    s_bDragging = FALSE;
+}
+```
+
+また、マウスの右ボタンでモードを切り替えられるようにする。
+
+```cpp
+static void OnRButtonUp(HWND hwnd, int x, int y, UINT flags)
+{
+    s_nMode = (s_nMode == MODE_DRAW) ? MODE_SELECT : MODE_DRAW;
+}
+```
+
+これで選択モードは実装できた。`ninja`して試してみよう。
+
+![ペイントで選択](images/paint-select.png)\
+
+## 選択した領域の削除
+
+選択モードにすれば矩形選択ができることが確認できる。
+次は、選択した領域に対する処理を実装する。
+
+まずは、削除だが、領域を黒く塗ることで実装する。
+
+```cpp
+static void OnDelete(HWND hwnd)
+{
+    if (s_nMode != MODE_SELECT)
+        return;
+
+    RECT rc;
+    SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+    DoNormalizeRect(&rc);
+
+    if (HDC hMemDC = CreateCompatibleDC(NULL))
+    {
+        HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+        FillRect(hMemDC, &rc, GetStockBrush(BLACK_BRUSH));
+        SelectBitmap(hMemDC, hbmOld);
+
+        DeleteDC(hMemDC);
+
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+}
+
+...(中略)...
+
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case ID_CUT:
+        ...(中略)...
+        break;
+    case ID_DELETE:
+        OnDelete(hwnd);
+        break;
+    case ID_SELECT_ALL:
+        // TODO:
+        break;
+    }
+}
+```
+
+これで削除が実装できた。
 
 # 結び
 
