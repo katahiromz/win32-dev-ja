@@ -44,8 +44,8 @@
 
 以下の２つの文字列を比較してほしい：
 
-- `ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ`
-- `ABCDEFGHIJKLMNOPQRSTUVWXYZ`
+- `ＡＢＣＤＥＦＧＨＩＪＫＬＭＮ`
+- `ABCDEFGHIJKLMN`
 
 前者が全角（ぜんかく）文字で、後者が半角（はんかく）文字である。昔のパソコンでは全角文字は半角文字の二倍の幅を持っていた。半角文字の多くは英語のASCII文字と互換性があり、英語圏でも同じデータでやり取りできるが、全角文字を日本語ではないパソコンで表示しようとすると問題が発生することがある。
 
@@ -2412,7 +2412,7 @@ static HFONT s_hFont = NULL;
     SetWindowFont(hEdit, s_hFont, TRUE);
 ```
 
-これで等幅フォント作成と設定ができた。最後に`s_hFont`を破棄する。
+これで等幅フォント作成と設定ができた。`WinMain`の最後で`s_hFont`を破棄する。
 
 ```cpp
     DeleteObject(s_hFont);
@@ -3013,7 +3013,7 @@ add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
 target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 ```
 
-# 大規模開発の心得
+# 大規模開発のテクニック
 
 大規模開発に使えるテクニックをいくつか紹介する。
 
@@ -3055,7 +3055,7 @@ s_fnOldProc = SubclassWindow(hwnd, NewWindowProc);
 
 C++のクラスを使って動的に作成した実体をウィンドウハンドルに結び付けたい場合、
 `SetWindowLongPtr`関数の`GWLP_USERDATA`を使うとよい（ただしダイアログの場合は`DWL_USER`を使うこと）。
-`GWLP_USERDATA`を使えば、ウィンドウハンドルに任意のポインタをセットできる。
+`GWLP_USERDATA`を使えば、ウィンドウハンドルに任意のポインタを関連付けることができる。
 ウィンドウプロシージャ自体は、クラスの静的関数にすることが多い。
 
 クラスと`GWLP_USERDATA`の使用例を示そう。
