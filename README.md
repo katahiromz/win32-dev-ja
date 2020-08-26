@@ -1378,8 +1378,8 @@ target_link_libraries(dialog PRIVATE comctl32)
 
 # メモ帳を作る（notepad）
 
-それでは、もうちょっと冒険してメモ帳を作ってみよう。
-今度はダイアログを使わないのでちょっとややこしくなる。
+それでは、もう少し冒険してメモ帳を作ってみよう。
+今度はダイアログアプリではない、普通のウィンドウアプリなので少しややこしくなる。
 `c:\dev\cxx`に`notepad`というフォルダを作り、そこに`CMakeLists.txt`、`notepad.cpp`、`notepad_res.rc`を配置する。
 
 `CMakeLists.txt`は次のような内容である。
