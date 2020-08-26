@@ -1534,7 +1534,9 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 ```
 
-この`WindowProc`関数はウィンドウプロシージャである。戻り値が`INT_PTR`ではなく`LRESULT`であることがダイアログプロシージャとは異なる。また、`default:`の処理で`DefWindowProc`関数を呼んでいることに注意する。
+この`WindowProc`関数はウィンドウプロシージャである。戻り値が`INT_PTR`ではなく`LRESULT`であることがダイアログプロシージャとは異なる。
+また、`default:`の処理で`DefWindowProc`関数を呼んでいることに注意。
+サブクラス化していないウィンドウプロシージャでは、既定の処理で`DefWindowProc`を呼ぶ決まりになっている。
 
 次は`WinMain`関数の内部を見ていこう。
 
