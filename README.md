@@ -1443,6 +1443,7 @@ WinMain(HINSTANCE   hInstance,
         INT         nCmdShow)
 {
     s_hInst = hInstance;
+    InitCommonControls();
 
     WNDCLASS wc;
     ZeroMemory(&wc, sizeof(wc));
@@ -1750,6 +1751,7 @@ WinMain(HINSTANCE   hInstance,
         INT         nCmdShow)
 {
     s_hInst = hInstance;
+    InitCommonControls();
 
     WNDCLASS wc;
     ZeroMemory(&wc, sizeof(wc));
@@ -2126,6 +2128,7 @@ WinMain(HINSTANCE   hInstance,
         INT         nCmdShow)
 {
     s_hInst = hInstance;
+    InitCommonControls();
 
     WNDCLASS wc;
     ZeroMemory(&wc, sizeof(wc));
@@ -2849,6 +2852,7 @@ WinMain(HINSTANCE   hInstance,
         INT         nCmdShow)
 {
     s_hInst = hInstance;
+    InitCommonControls();
 
     WNDCLASS wc;
     ZeroMemory(&wc, sizeof(wc));
