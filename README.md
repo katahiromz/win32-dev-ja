@@ -2603,6 +2603,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 }
 ```
 
+`EDIT`コントロールの`EM_REPLACESEL`メッセージは、現在の選択範囲を指定したテキストに置き換える。
+`EDIT`コントロール固有のメッセージは`EM_`で始まる決まりだ。
+
 これでメニュー項目を選べば、現在の日時を挿入できる。
 
 ![日時の挿入](images/datetime.png)\
