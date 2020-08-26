@@ -2605,6 +2605,8 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 これでメニュー項目を選べば、現在の日時を挿入できる。
 
+![日時の挿入](images/datetime.png)\
+
 ## まとめ
 
 ここまでのソースコードをまとめとこう。
