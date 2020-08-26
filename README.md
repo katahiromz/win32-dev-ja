@@ -3019,7 +3019,7 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 
 # お絵かきソフトを作る（paint）
 
-次はお絵かきソフトを作ろう。マウスでお絵かき楽しいな。
+次はお絵かきソフトを作ろう。マウスでお絵かきできるかな。
 
 ## 初期のソース
 
@@ -3497,27 +3497,30 @@ HBITMAP DoCreate24BppBitmap(INT cx, INT cy)
 
 ## キャンバスの初期実装
 
-次のコードにより、キャンバスのウィンドウハンドルにビットマップのハンドルを関連付ける。
+まず、ビットマップハンドルを保存する変数を用意する。
 
 ```cpp
+static HBITMAP s_hbm = NULL;
+```
+
+次のコードにより、キャンバスウィンドウ作成時にビットマップを作成する。
+
+```cpp
+
 static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 {
-    HBITMAP hbm = DoCreate24BppBitmap(320, 120);
-    SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)hbm);
+    s_hbm = DoCreate24BppBitmap(320, 120);
     return TRUE;
 }
 ```
-
-`Get/SetWindowLongPtr`関数の`GWLP_USERDATA`を使えば、ウィンドウハンドルに
-任意のポインタを関連付けることができる。
 
 ビットマップを作成したら後で破棄しないといけない。キャンバスウィンドウの`WM_DESTROY`で破棄する。
 
 ```
 static void OnDestroy(HWND hwnd)
 {
-    HBITMAP hbm = (HBITMAP)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-    DeleteObject(hbm);
+    DeleteObject(s_hbm);
+    s_hbm = NULL;
 }
 ```
 
@@ -3527,16 +3530,15 @@ static void OnDestroy(HWND hwnd)
 ```cpp
 static void OnPaint(HWND hwnd)
 {
-    HBITMAP hbm = (HBITMAP)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     BITMAP bm;
-    GetObject(hbm, sizeof(bm), &bm);
+    GetObject(s_hbm, sizeof(bm), &bm);
 
     PAINTSTRUCT ps;
     if (HDC hDC = BeginPaint(hwnd, &ps))
     {
         if (HDC hMemDC = CreateCompatibleDC(NULL))
         {
-            HBITMAP hbmOld = SelectBitmap(hMemDC, hbm);
+            HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbm);
             BitBlt(hDC, 0, 0, bm.bmWidth, bm.bmHeight,
                    hMemDC, 0, 0, SRCCOPY);
             SelectBitmap(hMemDC, hbmOld);
@@ -3549,11 +3551,15 @@ static void OnPaint(HWND hwnd)
 ```
 
 `WM_PAINT`の処理で描画を行うときは、描画コードを`BeginPaint`と`EndPaint`で挟み込む。
-`BeginPaint`は、`HDC`（デバイス コンテキストのハンドル）を返す。これをうまく使えば、ウィンドウに描画することができる。
+`BeginPaint`は、`HDC`（デバイス コンテキストのハンドル）を返す。
+このデバイスコンテキストというものは、画面の一部の描画対象を表している。
+これをうまく使えば、ウィンドウに描画することができる。
+
 `CreateCompatibleDC(NULL)`はもう一つ別のデバイス コンテキスト（DC）を返す。これはメモリー上のDCである。
 `CreateCompatibleDC(NULL)`を呼んだら、後でその戻り値を`DeleteDC`で破棄しないといけない。
 `hMemDC`でビットマップのハンドル（`hbm`）を選択して、`BitBlt`でビット群を`hDC`に転送すれば、
 ビットイメージが`hDC`に転送される。これが画面への描画を引き起こす。
+ビットマップを選択した後は、もう一度`SelectBrush`を呼んで選択を元に戻した方がよい。
 
 `ninja`して確認しよう。
 
@@ -3561,169 +3567,128 @@ static void OnPaint(HWND hwnd)
 
 横320x縦120ピクセルの黒い画像が表示されているのが分かる。
 
-# 大規模開発のテクニック
+## マウスで線を描く
 
-大規模開発に使えるテクニックをいくつか紹介する。
+マウスで線を引けるようにするには、
+`WM_LBUTTONDOWN`、
+`WM_MOUSEMOVE`、
+`WM_LBUTTONUP`
+を処理しないといけない。
+`WM_LBUTTONDOWN`は、クライアント領域でマウスの左ボタンをクリックしたときに発生する。
+`WM_MOUSEMOVE`は、マウスを移動させたときに発生する。
+`WM_LBUTTONUP`は、マウスの左ボタンを離したときに発生する。
 
-## `assert`文
-
-プログラミングで特定の状態を仮定する場合は、
-`<cassert>`の`assert`文を使えば、動作確認を自動化することができる。
-`assert`の文法は次の通り。
-
-```cpp
-assert(条件式);
-```
-
-条件式が真ならば、何もしない。
-条件式が偽であれば、実行時エラーが発生して、プログラムの実行が停止して、エラーが起こった行を確認できる。
-
-`assert`の使用例を下に示す。
+これらを実装する。
 
 ```cpp
-assert(IsWindow(m_hwnd));
-```
+static BOOL s_bDragging = FALSE;
+static POINT s_ptOld;
+...(中略)...
 
-## サブクラス化
+static void OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+{
+    if (fDoubleClick)
+        return;
 
-`<windowsx.h>`にある`SubclassWindow`マクロ関数を使えば、
-ウィンドウの「サブクラス化」を行うことができる。
-サブクラス化とは、メッセージの処理において新たなウィンドウプロシージャを追加して
-ウィンドウの動作を改変することである。
+    s_bDragging = TRUE;
+    SetCapture(hwnd);
 
-サブクラス化は、次のように行う。
+    s_ptOld.x = x;
+    s_ptOld.y = y;
+}
 
-```cpp
-static WNDPROC s_fnOldProc; // 古いウィンドウプロシージャ。
+static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
 
-// 新たなウィンドウプロシージャ。
+    POINT pt = { x, y };
+    if (HDC hMemDC = CreateCompatibleDC(NULL))
+    {
+        HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+        HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbm);
+        MoveToEx(hMemDC, s_ptOld.x, s_ptOld.y, NULL);
+        LineTo(hMemDC, x, y);
+        SelectBitmap(hMemDC, hbmOld);
+        SelectPen(hMemDC, hPenOld);
+
+        DeleteDC(hMemDC);
+
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    s_ptOld = pt;
+}
+
+static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    if (HDC hMemDC = CreateCompatibleDC(NULL))
+    {
+        HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+        HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbm);
+        MoveToEx(hMemDC, s_ptOld.x, s_ptOld.y, NULL);
+        LineTo(hMemDC, x, y);
+        SelectBitmap(hMemDC, hbmOld);
+        SelectPen(hMemDC, hPenOld);
+
+        DeleteDC(hMemDC);
+
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    ReleaseCapture();
+    s_bDragging = FALSE;
+}
+
 LRESULT CALLBACK
-NewWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     switch (uMsg)
     {
-    ...(ここに独自の処理を書く)...
+        HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
+        HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_PAINT, OnPaint);
+        HANDLE_MSG(hwnd, WM_LBUTTONDOWN, OnLButtonDown);
+        HANDLE_MSG(hwnd, WM_MOUSEMOVE, OnMouseMove);
+        HANDLE_MSG(hwnd, WM_LBUTTONUP, OnLButtonUp);
+        case WM_CAPTURECHANGED:
+            s_bDragging = FALSE;
+            break;
     default:
-        return CallWindowProc(s_fnOldProc, hwnd, uMsg, wParam, lParam);
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     return 0;
 }
-
-// サブクラス化。
-s_fnOldProc = SubclassWindow(hwnd, NewWindowProc);
 ```
 
-サブクラス化するウィンドウプロシージャの既定の処理では、
-`DefWindowProc`ではなく、`CallWindowProc`を呼ぶことが決まりになっている。
+一つ一つ見ていこう。
+`s_bDragging`は、現在マウスドラッグ中かを表す変数である。
+ドラッグとは、ボタンを押しながら引きずるようなマウスの操作のことである。
+ここでは、ドラッグで白い線を引くことを想定している。
 
-## ウィンドウハンドルにユーザデータを結びつける
+`s_ptOld`は、`POINT`構造体で一つ前の位置を表している。
 
-オブジェクト指向は、C++の重要な設計思想である。C++のプログラミングでは大規模開発で必要不可欠な「クラス」が使える。
+`OnLButtonDown`では、`s_bDragging`を`TRUE`にして、`SetCapture`関数を呼ぶことでマウスドラッグを開始する。
+そして位置を`s_ptOld`に保存している。`SetCapture`を呼ぶと、マウスの動きの追跡を開始して、マウスポインタが
+ウィンドウから離れてもメッセージを吸い取るようになる（キャプチャー）。
 
-C++のクラスを使って動的に作成した実体をウィンドウハンドルに結び付けたい場合、
-`SetWindowLongPtr`関数の`GWLP_USERDATA`を使うとよい（ただしダイアログの場合は`DWL_USER`を使うこと）。
-`GWLP_USERDATA`を使えば、ウィンドウハンドルに任意のポインタを関連付けることができる。
-ウィンドウプロシージャ自体は、クラスの静的関数にすることが多い。
+次に`OnMouseMove`では、`s_bDragging`がTRUEならば、
+白いペンを使って、一つ前の位置から現在の位置まで、ビットマップ上に白い線を引いている。
+`InvalidateRect`は、ウィンドウの再描画を引き起こす。
+そして`s_ptOld`を更新している。
 
-クラスと`GWLP_USERDATA`の使用例を示そう。
+それから`OnLButtonUp`では、`ReleaseCapture`でキャプチャーを解放してドラッグを終了する。
 
-```cpp
-class MWindow
-{
-public:
-    HWND m_hwnd;
-    WNDPROC m_fnOldProc;
+`WM_CAPTURECHANGED`メッセージだけは`HANDLE_MSG`で対応していないのでこのようになる。
 
-    MWindow() : m_hwnd(NULL), m_fnOldProc(NULL)
-    {
-    }
+これで線が引けるはずである。`ninja`して確認しよう。
 
-    ...
-
-    virtual LRESULT CALLBACK
-    DefProcDx(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
-        if (m_fnOldProc)
-            return ::CallWindowProc(m_fnOldProc, hwnd, uMsg, wParam, lParam);
-        else
-            return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-
-    virtual LRESULT CALLBACK
-    WindowProcDx(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
-        switch (uMsg)
-        {
-            HANDLE_MSG(hwnd, WM_CREATE, OnCreate);
-            HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
-            ...
-        default:
-            return DefProcDx(hwnd, uMsg, wParam, lParam);
-        }
-        return 0;
-    }
-
-    static LRESULT CALLBACK
-    WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-    {
-        MWindow *this_ = (MWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-        CREATESTRUCT *pCS;
-        switch (uMsg)
-        {
-        case WM_CREATE:
-            pCS = (CREATESTRUCT *)lParam;
-            this_ = (MWindow *)pCS->lpCreateStruct;
-            assert(this_ != NULL);
-            this_->m_hwnd = hwnd;
-            SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this_);
-            return this_->WindowProcDx(hwnd, uMsg, wParam, lParam);
-        default:
-            if (this_)
-                return this_->WindowProcDx(hwnd, uMsg, wParam, lParam);
-        }
-        return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-
-    LPCTSTR GetWndClassName() const;
-
-    BOOL RegisterDx()
-    {
-        WNDCLASS wc;
-        ZeroMemory(&wc, sizeof(wc));
-        ...
-        wc.lpfnWndProc = WindowProc;
-        wc.lpszClassName = GetWndClassName();
-        return !!RegisterClass(&wc);
-    }
-
-    BOOL CreateDx(HWND hwndParent, LPCTSTR pszText = NULL)
-    {
-        RegisterDx();
-        ...
-        CreateWindow(GetWndClassName(), pszText, ...
-                     this);
-        return m_hwnd != NULL;
-    }
-
-    BOOL SubclassDx(HWND hwnd)
-    {
-        m_hwnd = hwnd;
-        m_fnOldProc = SubclassWindow(hwnd, WindowProc);
-        return m_fnOldProc != NULL;
-    }
-
-protected:
-    BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
-    {
-        ...
-    }
-
-    void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
-    {
-        ...
-    }
-};
-```
+![ペイントで白い線](images/paint-draw-lines.png)\
 
 # 結び
 
