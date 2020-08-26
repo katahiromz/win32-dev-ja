@@ -3013,6 +3013,145 @@ add_executable(notepad WIN32 notepad.cpp notepad_res.rc)
 target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 ```
 
+# 大規模開発の心得
+
+大規模開発に使えるテクニックをいくつか紹介する。
+
+## サブクラス化
+
+`<windowsx.h>`にある`SubclassWindow`マクロ関数を使えば、
+ウィンドウの「サブクラス化」を行うことができる。
+サブクラス化とは、メッセージの処理において新たなウィンドウプロシージャを追加して
+ウィンドウの動作を改変することである。
+
+サブクラス化は、次のように行う。
+
+```cpp
+static WNDPROC s_fnOldProc; // 古いウィンドウプロシージャ。
+
+// 新たなウィンドウプロシージャ。
+LRESULT CALLBACK
+NewWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    ...(ここに独自の処理を書く)...
+    default:
+        return CallWindowProc(s_fnOldProc, hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+
+// サブクラス化。
+s_fnOldProc = SubclassWindow(hwnd, NewWindowProc);
+```
+
+サブクラス化するウィンドウプロシージャの既定の処理では、
+`DefWindowProc`ではなく、`CallWindowProc`を呼ぶことが決まりになっている。
+
+## ウィンドウハンドルにユーザデータを結びつける
+
+オブジェクト指向は、C++の重要な設計思想である。C++のプログラミングでは大規模開発で必要不可欠な「クラス」が使える。
+
+C++のクラスを使って動的に作成した実体をウィンドウハンドルに結び付けたい場合、
+`SetWindowLongPtr`関数の`GWLP_USERDATA`を使うとよい（ただしダイアログの場合は`DWL_USER`を使うこと）。
+`GWLP_USERDATA`を使えば、ウィンドウハンドルに任意のポインタをセットできる。
+ウィンドウプロシージャ自体は、クラスの静的関数にすることが多い。
+
+クラスと`GWLP_USERDATA`の使用例を示そう。
+
+```cpp
+class MWindow
+{
+public:
+    MWindow() : m_hwnd(NULL)
+    {
+    }
+    ...
+
+    virtual LRESULT CALLBACK
+    WindowProcDx(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        switch (uMsg)
+        {
+            HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+            ...
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+        }
+        return 0;
+    }
+
+    static LRESULT CALLBACK
+    WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+    {
+        MWindow *this_ = (MWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+        CREATESTRUCT *pCS;
+        switch (uMsg)
+        {
+        case WM_CREATE:
+            pCS = (CREATESTRUCT *)lParam;
+            this_ = (MWindow *)pCS->lpCreateStruct;
+            this_->m_hwnd = hwnd;
+            SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this_);
+            return this_->WindowProcDx(hwnd, uMsg, wParam, lParam);
+        default:
+            if (this_)
+                return this_->WindowProcDx(hwnd, uMsg, wParam, lParam);
+        }
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+
+    LPCTSTR GetWndClassName() const;
+
+    BOOL DoRegister()
+    {
+        WNDCLASS wc;
+        ZeroMemory(&wc, sizeof(wc));
+        ...
+        wc.lpfnWndProc = WindowProc;
+        wc.lpszClassName = GetWndClassName();
+        return !!RegisterClass(&wc);
+    }
+
+    BOOL DoCreate(HWND hwndParent, LPCTSTR pszText = NULL)
+    {
+        DoRegister();
+        ...
+        CreateWindow(GetWndClassName(), pszText, ...
+                     this);
+        return m_hwnd != NULL;
+    }
+
+protected:
+    HWND m_hwnd;
+
+    void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+    {
+        ...
+    }
+};
+```
+
+## `assert`文
+
+プログラミングで特定の状態を仮定する場合は、
+`<cassert>`の`assert`文を使えば、動作確認を自動化することができる。
+`assert`の文法は次の通り。
+
+```cpp
+assert(条件式);
+```
+
+条件式が真ならば、何もしない。
+条件式が偽であれば、実行時エラーが発生して、プログラムの実行が停止して、エラーが起こった行を確認できる。
+
+`assert`の使用例を下に示す。
+
+```cpp
+assert(IsWindow(m_hwnd));
+```
+
 # 結び
 
 ここまでC++/Win32のプログラミングについて解説した。少しずつ修正・改良・テストするという手法なら、くじけず開発を続けることができる。GitHubやインターネットにはもっと多くの情報が掲載されている。研究を続け、どんどん工夫していけば、高度なアプリも作れるようになれるだろう。
