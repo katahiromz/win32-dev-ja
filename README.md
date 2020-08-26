@@ -2489,9 +2489,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 }
 ```
 
-多くの機能は、SendMessageでメッセージを送信するだけで利用可能だ。
+多くの機能は、`SendMessage`関数でメッセージを送信するだけで利用可能だ。
 アクセスキーの`Ctrl+X`、`Ctrl+C`、`Ctrl+V`、`Del`、`Ctrl+A`については、
-EDITコントロールにすでに実装されているので追加しなくてもよい。
+`EDIT`コントロールにすでに実装されているので追加しなくてもよい。
 
 `ninja`を実行してちゃんと動作するか確認しよう。
 
