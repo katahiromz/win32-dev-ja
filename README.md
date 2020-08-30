@@ -1245,7 +1245,12 @@ void OnOK(HWND hwnd)
 
 何度も「OK」ボタンを押すと、最初がゼロでない限り、２倍の２倍の２倍の……となって、急激に増加するだろう。
 
-ここまでのソース（`dialog.cpp`）は以下の通り。
+ここまでのソースをGitHubに掲載している。
+
+- [https://github.com/katahiromz/dialog1](https://github.com/katahiromz/dialog1)
+
+インターネットに接続できない人たちのために、ここにも掲載しておく。
+ソース（`dialog.cpp`）は以下の通り。
 
 ```cpp
 #include <windows.h>
@@ -2634,6 +2639,8 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 ここまでのソースコードをまとめとこう。
 
+- [https://github.com/katahiromz/notepad1](https://github.com/katahiromz/notepad1)
+
 まず、ソース（`notepad.cpp`）。
 
 ```cpp
@@ -3039,6 +3046,10 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 次はお絵かきソフトを作ろう。マウスでお絵かきできるかな。
 
 ## 初期のソース
+
+初期のソースをここに掲載する。
+
+- [https://github.com/katahiromz/paint1](https://github.com/katahiromz/paint1)
 
 最初にヘッダファイル`paint.h`は次の通り。
 
@@ -4015,13 +4026,17 @@ CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 横320x縦120ピクセルの黒い画像が表示されているのが分かる。
 
+ここまでのソースを次に掲載する。
+
+- [https://github.com/katahiromz/paint2](https://github.com/katahiromz/paint2)
+
 ## マウスで線を描く
 
 マウスで線を引けるようにするには、
 `WM_LBUTTONDOWN`、
 `WM_MOUSEMOVE`、
 `WM_LBUTTONUP`
-を処理しないといけない。
+メッセージを処理しないといけない。
 `WM_LBUTTONDOWN`は、クライアント領域でマウスの左ボタンをクリックしたときに発生する。
 `WM_MOUSEMOVE`は、マウスを移動させたときに発生する。
 `WM_LBUTTONUP`は、マウスの左ボタンを離したときに発生する。
@@ -4140,6 +4155,10 @@ CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 ![ペイントで白い線](images/paint-draw-lines.png)\
 
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint3](https://github.com/katahiromz/paint3)
+
 ## ビットマップの読み書き
 
 さて、ファイルの読み書きは`paint.cpp`の`DoLoad`と`DoSave`関数で行っていた。
@@ -4172,6 +4191,10 @@ BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
 
 これでビットマップの読み書きができるようになったはずだ。
 `ninja`して動作を確認しよう。
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint4](https://github.com/katahiromz/paint4)
 
 ## モードについて
 
@@ -4208,7 +4231,7 @@ void DoNormalizeRect(RECT *prc)
 }
 ```
 
-`DoNormalizeRect`は、長方形を表す`RECT`構造体のメンバーを整える関数である。
+この`DoNormalizeRect`関数は、長方形を表す`RECT`構造体を整える関数であり、
 左（`left`）より右（`right`）が右側に来るようにして、
 上（`top`）より下（`bottom`）が下側に来るようにしている。
 
@@ -4342,6 +4365,10 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 ![ペイントで選択](images/paint-select.png)\
 
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint5](https://github.com/katahiromz/paint5)
+
 ## 選択した領域の削除
 
 選択モードにすれば矩形選択ができることが確認できる。
@@ -4359,7 +4386,7 @@ static void OnDelete(HWND hwnd)
     SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
     DoNormalizeRect(&rc);
 
-    DoPutSubImage(g_hbm, prc, NULL);
+    DoPutSubImage(g_hbm, &rc, NULL);
     InvalidateRect(hwnd, NULL, TRUE);
 }
 
@@ -4382,43 +4409,13 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 これで削除が実装できた。
 
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint6](https://github.com/katahiromz/paint6)
+
 ## 選択した領域のコピー
 
 次はコピーだ。クリップボードにビットマップをセットすることで実現する。
-
-さらに`HBITMAP`をDIBの生データに変換する関数`DIBFromBitmap`が`bitmap.cpp`にあるので、
-これを使用する。
-
-```cpp
-HGLOBAL DIBFromBitmap(HBITMAP hbm)
-{
-    BITMAP bm;
-    GetObject(hbm, sizeof(bm), &bm);
-
-    BITMAPINFO bmi;
-    ZeroMemory(&bmi, sizeof(bmi));
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = bm.bmWidth;
-    bmi.bmiHeader.biHeight = bm.bmHeight;
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 24;
-
-    DWORD cbBits = bm.bmWidthBytes * bm.bmHeight;
-    DWORD cbSize = sizeof(BITMAPINFOHEADER) + cbBits;
-    HGLOBAL ret = GlobalAlloc(GHND | GMEM_SHARE, cbSize);
-    if (!ret)
-        return NULL;
-
-    LPBYTE pb = (LPBYTE)GlobalLock(ret);
-    CopyMemory(pb, &bmi, sizeof(BITMAPINFOHEADER));
-    CopyMemory(pb + sizeof(BITMAPINFOHEADER), bm.bmBits, cbBits);
-    GlobalUnlock(ret);
-
-    return ret;
-}
-```
-
-これらを使って`OnCopy`を実装する。
 
 ```cpp
 static void OnCopy(HWND hwnd)
@@ -4453,7 +4450,7 @@ static void OnCopy(HWND hwnd)
 }
 ```
 
-これを使って`OnCommand`を更新する。
+`OnCommand`にこれを適応する。
 
 ```cpp
 static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -4486,6 +4483,12 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 }
 ```
 
+このペイントには貼り付けはできないが、コピーしたものを他のペイントソフトに貼り付けできる。
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint7](https://github.com/katahiromz/paint7)
+
 ## モードのポリモーフィズム
 
 モード変数により切り替えるコードは、ややこしくなりがちである。
@@ -4509,7 +4512,7 @@ struct IMode
 };
 ```
 
-そして`canvas.cpp`に次のように書く。
+そして`canvas.cpp`の`DoNormalizeRect`関数の定義の下に次のように書く。
 
 ```cpp
 struct ModeSelect : IMode
@@ -4539,7 +4542,7 @@ struct ModeSelect : IMode
     }
 };
 
-struct ModeDraw : IMode
+struct ModePencil : IMode
 {
     virtual void DoLButtonDown(HWND hwnd, POINT pt)
     {
@@ -4587,7 +4590,7 @@ struct ModeDraw : IMode
     }
 };
 
-static IMode *s_pMode = new ModeDraw();
+static IMode *s_pMode = new ModePencil();
 
 void DoSetMode(MODE nMode)
 {
@@ -4598,7 +4601,7 @@ void DoSetMode(MODE nMode)
         s_pMode = new ModeSelect();
         break;
     case MODE_PENCIL:
-        s_pMode = new ModeDraw();
+        s_pMode = new ModePencil();
         break;
     }
     g_nMode = nMode;
@@ -4683,15 +4686,22 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 
 どうだろう。少しコードが見やすくなっただろう。
 
+これからモードを変更するときは、常に`DoSetMode`関数を経由して行うものとする。
+
 `ninja`して変わりなく動くかどうか確かめてみよう。
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint8](https://github.com/katahiromz/paint8)
 
 ## 領域のドラッグの実装
 
-選択した領域をドラッグできるようにしたい。まずは、次のような変数`s_hbmSelected`と`s_rcSelected`を追加する。
+選択した領域をドラッグできるようにしたい。まずは、
+`canvas.cpp`に次のような変数`s_hbmFloating`と`s_rcFloating`を追加する。
 
 ```cpp
-static HBITMAP s_hbmSelected = NULL;
-static RECT s_rcSelected;
+static HBITMAP s_hbmFloating = NULL;
+static RECT s_rcFloating;
 ```
 
 選択して移動させた領域は、浮き上げる。
@@ -4701,22 +4711,22 @@ static RECT s_rcSelected;
 ```cpp
 void DoTakeOff(void)
 {
-    if (!s_hbmSelected)
+    if (!s_hbmFloating)
     {
-        s_hbmSelected = DoGetSubImage(g_hbm, &s_rcSelected);
-        DoPutSubImage(g_hbm, &s_rcSelected, NULL);
+        s_hbmFloating = DoGetSubImage(g_hbm, &s_rcFloating);
+        DoPutSubImage(g_hbm, &s_rcFloating, NULL);
     }
 }
 
 void DoLanding(void)
 {
-    if (s_hbmSelected)
+    if (s_hbmFloating)
     {
-        DoPutSubImage(g_hbm, &s_rcSelected, s_hbmSelected);
-        DeleteBitmap(s_hbmSelected);
-        s_hbmSelected = NULL;
+        DoPutSubImage(g_hbm, &s_rcFloating, s_hbmFloating);
+        DeleteBitmap(s_hbmFloating);
+        s_hbmFloating = NULL;
     }
-    SetRectEmpty(&s_rcSelected);
+    SetRectEmpty(&s_rcFloating);
 }
 ```
 
@@ -4729,7 +4739,7 @@ struct ModeSelect : IMode
     {
         s_pt = s_ptOld = pt;
 
-        if (PtInRect(&s_rcSelected, pt))
+        if (PtInRect(&s_rcFloating, pt))
         {
             DoTakeOff();
         }
@@ -4742,9 +4752,9 @@ struct ModeSelect : IMode
 
     virtual void DoMouseMove(HWND hwnd, POINT pt)
     {
-        if (s_hbmSelected)
+        if (s_hbmFloating)
         {
-            OffsetRect(&s_rcSelected, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
+            OffsetRect(&s_rcFloating, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
             s_pt = s_ptOld = pt;
         }
         else
@@ -4756,14 +4766,16 @@ struct ModeSelect : IMode
 
     virtual void DoLButtonUp(HWND hwnd, POINT pt)
     {
-        if (s_hbmSelected)
+        if (s_hbmFloating)
         {
-            OffsetRect(&s_rcSelected, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
+            OffsetRect(&s_rcFloating, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
             s_pt = s_ptOld = pt;
         }
         else
         {
             s_pt = pt;
+            SetRect(&s_rcFloating, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&s_rcFloating);
         }
         InvalidateRect(hwnd, NULL, TRUE);
     }
@@ -4772,22 +4784,22 @@ struct ModeSelect : IMode
     {
         RECT rc;
 
-        if (s_hbmSelected)
-            rc = s_rcSelected;
+        if (s_hbmFloating)
+            rc = s_rcFloating;
         else
             SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
 
         DoNormalizeRect(&rc);
 
-        if (!IsRectEmpty(&s_rcSelected) && s_hbmSelected)
+        if (!IsRectEmpty(&s_rcFloating) && s_hbmFloating)
         {
             if (HDC hMemDC = CreateCompatibleDC(NULL))
             {
-                HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbmSelected);
+                HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbmFloating);
                 {
-                    BitBlt(hDC, s_rcSelected.left, s_rcSelected.top,
-                        s_rcSelected.right - s_rcSelected.left,
-                        s_rcSelected.bottom - s_rcSelected.top,
+                    BitBlt(hDC, s_rcFloating.left, s_rcFloating.top,
+                        s_rcFloating.right - s_rcFloating.left,
+                        s_rcFloating.bottom - s_rcFloating.top,
                         hMemDC, 0, 0, SRCCOPY);
                 }
                 SelectBitmap(hMemDC, hbmOld);
@@ -4796,12 +4808,15 @@ struct ModeSelect : IMode
         }
 
         DrawFocusRect(hDC, &rc);
-        s_rcSelected = rc;
     }
 };
 ```
 
 `ninja`して実行すると、領域のドラッグが可能になる。
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint9](https://github.com/katahiromz/paint9)
 
 ## すべて選択
 
@@ -4816,11 +4831,11 @@ static void OnSelectAll(HWND hwnd)
 
     BITMAP bm;
     GetObject(g_hbm, sizeof(bm), &bm);
-    SetRect(&s_rcSelected, 0, 0, bm.bmWidth, bm.bmHeight);
-    s_ptOld.x = s_rcSelected.left;
-    s_ptOld.y = s_rcSelected.top;
-    s_pt.x = s_rcSelected.right;
-    s_pt.y = s_rcSelected.bottom;
+    SetRect(&s_rcFloating, 0, 0, bm.bmWidth, bm.bmHeight);
+    s_ptOld.x = s_rcFloating.left;
+    s_ptOld.y = s_rcFloating.top;
+    s_pt.x = s_rcFloating.right;
+    s_pt.y = s_rcFloating.bottom;
 
     InvalidateRect(hwnd, NULL, TRUE);
 }
@@ -4836,6 +4851,10 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     }
 }
 ```
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint10](https://github.com/katahiromz/paint10)
 
 ## 貼り付け
 
@@ -4857,10 +4876,10 @@ static void OnPaste(HWND hwnd)
 
             DoSetMode(MODE_SELECT);
 
-            SetRect(&s_rcSelected, 0, 0, bm.bmWidth, bm.bmHeight);
-            if (s_hbmSelected)
-                DeleteObject(s_hbmSelected);
-            s_hbmSelected = hbm;
+            SetRect(&s_rcFloating, 0, 0, bm.bmWidth, bm.bmHeight);
+            if (s_hbmFloating)
+                DeleteObject(s_hbmFloating);
+            s_hbmFloating = hbm;
 
             InvalidateRect(hwnd, NULL, TRUE);
         }
@@ -4884,6 +4903,10 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 ```
 
 これで貼り付けが可能になった。
+
+ここまでのソースを次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint11](https://github.com/katahiromz/paint11)
 
 ## 「ツール」メニューの改良
 
@@ -4925,6 +4948,8 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 ## まとめ
 
 ここまでのソースを掲載する。
+
+- [https://github.com/katahiromz/paint12](https://github.com/katahiromz/paint12)
 
 まずは`CMakeLists.txt`。
 
@@ -5272,33 +5297,13 @@ HGLOBAL DIBFromBitmap(HBITMAP hbm)
 ```cpp
 #include "paint.h"
 
-MODE g_nMode = MODE_PENCIL;
-static POINT s_pt;
 HBITMAP g_hbm = NULL;
 static BOOL s_bDragging = FALSE;
 static POINT s_ptOld;
-static HBITMAP s_hbmSelected = NULL;
-static RECT s_rcSelected;
-
-void DoTakeOff(void)
-{
-    if (!s_hbmSelected)
-    {
-        s_hbmSelected = DoGetSubImage(g_hbm, &s_rcSelected);
-        DoPutSubImage(g_hbm, &s_rcSelected, NULL);
-    }
-}
-
-void DoLanding(void)
-{
-    if (s_hbmSelected)
-    {
-        DoPutSubImage(g_hbm, &s_rcSelected, s_hbmSelected);
-        DeleteBitmap(s_hbmSelected);
-        s_hbmSelected = NULL;
-    }
-    SetRectEmpty(&s_rcSelected);
-}
+MODE g_nMode = MODE_PENCIL;
+static POINT s_pt;
+static HBITMAP s_hbmFloating = NULL;
+static RECT s_rcFloating;
 
 void DoNormalizeRect(RECT *prc)
 {
@@ -5308,13 +5313,33 @@ void DoNormalizeRect(RECT *prc)
         std::swap(prc->top, prc->bottom);
 }
 
+void DoTakeOff(void)
+{
+    if (!s_hbmFloating)
+    {
+        s_hbmFloating = DoGetSubImage(g_hbm, &s_rcFloating);
+        DoPutSubImage(g_hbm, &s_rcFloating, NULL);
+    }
+}
+
+void DoLanding(void)
+{
+    if (s_hbmFloating)
+    {
+        DoPutSubImage(g_hbm, &s_rcFloating, s_hbmFloating);
+        DeleteBitmap(s_hbmFloating);
+        s_hbmFloating = NULL;
+    }
+    SetRectEmpty(&s_rcFloating);
+}
+
 struct ModeSelect : IMode
 {
     virtual void DoLButtonDown(HWND hwnd, POINT pt)
     {
         s_pt = s_ptOld = pt;
 
-        if (PtInRect(&s_rcSelected, pt))
+        if (PtInRect(&s_rcFloating, pt))
         {
             DoTakeOff();
         }
@@ -5327,9 +5352,9 @@ struct ModeSelect : IMode
 
     virtual void DoMouseMove(HWND hwnd, POINT pt)
     {
-        if (s_hbmSelected)
+        if (s_hbmFloating)
         {
-            OffsetRect(&s_rcSelected, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
+            OffsetRect(&s_rcFloating, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
             s_pt = s_ptOld = pt;
         }
         else
@@ -5341,14 +5366,16 @@ struct ModeSelect : IMode
 
     virtual void DoLButtonUp(HWND hwnd, POINT pt)
     {
-        if (s_hbmSelected)
+        if (s_hbmFloating)
         {
-            OffsetRect(&s_rcSelected, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
+            OffsetRect(&s_rcFloating, pt.x - s_ptOld.x, pt.y - s_ptOld.y);
             s_pt = s_ptOld = pt;
         }
         else
         {
             s_pt = pt;
+            SetRect(&s_rcFloating, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&s_rcFloating);
         }
         InvalidateRect(hwnd, NULL, TRUE);
     }
@@ -5357,22 +5384,22 @@ struct ModeSelect : IMode
     {
         RECT rc;
 
-        if (s_hbmSelected)
-            rc = s_rcSelected;
+        if (s_hbmFloating)
+            rc = s_rcFloating;
         else
             SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
 
         DoNormalizeRect(&rc);
 
-        if (!IsRectEmpty(&s_rcSelected) && s_hbmSelected)
+        if (!IsRectEmpty(&s_rcFloating) && s_hbmFloating)
         {
             if (HDC hMemDC = CreateCompatibleDC(NULL))
             {
-                HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbmSelected);
+                HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbmFloating);
                 {
-                    BitBlt(hDC, s_rcSelected.left, s_rcSelected.top,
-                        s_rcSelected.right - s_rcSelected.left,
-                        s_rcSelected.bottom - s_rcSelected.top,
+                    BitBlt(hDC, s_rcFloating.left, s_rcFloating.top,
+                        s_rcFloating.right - s_rcFloating.left,
+                        s_rcFloating.bottom - s_rcFloating.top,
                         hMemDC, 0, 0, SRCCOPY);
                 }
                 SelectBitmap(hMemDC, hbmOld);
@@ -5381,11 +5408,11 @@ struct ModeSelect : IMode
         }
 
         DrawFocusRect(hDC, &rc);
-        s_rcSelected = rc;
+        s_rcFloating = rc;
     }
 };
 
-struct ModeDraw : IMode
+struct ModePencil : IMode
 {
     virtual void DoLButtonDown(HWND hwnd, POINT pt)
     {
@@ -5433,7 +5460,7 @@ struct ModeDraw : IMode
     }
 };
 
-static IMode *s_pMode = new ModeDraw();
+static IMode *s_pMode = new ModePencil();
 
 void DoSetMode(MODE nMode)
 {
@@ -5444,55 +5471,10 @@ void DoSetMode(MODE nMode)
         s_pMode = new ModeSelect();
         break;
     case MODE_PENCIL:
-        s_pMode = new ModeDraw();
+        s_pMode = new ModePencil();
         break;
     }
     g_nMode = nMode;
-}
-
-static void OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
-{
-    if (fDoubleClick || s_bDragging)
-        return;
-
-    s_bDragging = TRUE;
-    SetCapture(hwnd);
-
-    POINT pt = { x, y };
-    s_pMode->DoLButtonDown(hwnd, pt);
-}
-
-static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
-{
-    if (!s_bDragging)
-        return;
-
-    POINT pt = { x, y };
-    s_pMode->DoMouseMove(hwnd, pt);
-}
-
-static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
-{
-    if (!s_bDragging)
-        return;
-
-    POINT pt = { x, y };
-    s_pMode->DoLButtonUp(hwnd, pt);
-
-    ReleaseCapture();
-    s_bDragging = FALSE;
-}
-
-static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
-{
-    g_hbm = DoCreate24BppBitmap(320, 120);
-    return TRUE;
-}
-
-static void OnDestroy(HWND hwnd)
-{
-    DeleteObject(g_hbm);
-    g_hbm = NULL;
 }
 
 static void OnDelete(HWND hwnd)
@@ -5547,11 +5529,11 @@ static void OnSelectAll(HWND hwnd)
 
     BITMAP bm;
     GetObject(g_hbm, sizeof(bm), &bm);
-    SetRect(&s_rcSelected, 0, 0, bm.bmWidth, bm.bmHeight);
-    s_ptOld.x = s_rcSelected.left;
-    s_ptOld.y = s_rcSelected.top;
-    s_pt.x = s_rcSelected.right;
-    s_pt.y = s_rcSelected.bottom;
+    SetRect(&s_rcFloating, 0, 0, bm.bmWidth, bm.bmHeight);
+    s_ptOld.x = s_rcFloating.left;
+    s_ptOld.y = s_rcFloating.top;
+    s_pt.x = s_rcFloating.right;
+    s_pt.y = s_rcFloating.bottom;
 
     InvalidateRect(hwnd, NULL, TRUE);
 }
@@ -5571,10 +5553,10 @@ static void OnPaste(HWND hwnd)
 
             DoSetMode(MODE_SELECT);
 
-            SetRect(&s_rcSelected, 0, 0, bm.bmWidth, bm.bmHeight);
-            if (s_hbmSelected)
-                DeleteObject(s_hbmSelected);
-            s_hbmSelected = hbm;
+            SetRect(&s_rcFloating, 0, 0, bm.bmWidth, bm.bmHeight);
+            if (s_hbmFloating)
+                DeleteObject(s_hbmFloating);
+            s_hbmFloating = hbm;
 
             InvalidateRect(hwnd, NULL, TRUE);
         }
@@ -5612,6 +5594,18 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     }
 }
 
+static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    g_hbm = DoCreate24BppBitmap(320, 120);
+    return TRUE;
+}
+
+static void OnDestroy(HWND hwnd)
+{
+    DeleteObject(g_hbm);
+    g_hbm = NULL;
+}
+
 static void OnPaint(HWND hwnd)
 {
     BITMAP bm;
@@ -5633,6 +5627,39 @@ static void OnPaint(HWND hwnd)
         }
         EndPaint(hwnd, &ps);
     }
+}
+
+static void OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+{
+    if (fDoubleClick || s_bDragging)
+        return;
+
+    s_bDragging = TRUE;
+    SetCapture(hwnd);
+
+    POINT pt = { x, y };
+    s_pMode->DoLButtonDown(hwnd, pt);
+}
+
+static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    s_pMode->DoMouseMove(hwnd, pt);
+}
+
+static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    s_pMode->DoLButtonUp(hwnd, pt);
+
+    ReleaseCapture();
+    s_bDragging = FALSE;
 }
 
 LRESULT CALLBACK
@@ -5785,6 +5812,8 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_PASTE:
     case ID_DELETE:
     case ID_SELECT_ALL:
+    case ID_SELECT:
+    case ID_PENCIL:
         SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
         break;
     }
@@ -5800,6 +5829,19 @@ static void OnDropFiles(HWND hwnd, HDROP hdrop)
     DoLoad(hwnd, szPath);
 }
 
+static void OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
+{
+    switch (g_nMode)
+    {
+    case MODE_SELECT:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PENCIL, ID_SELECT, MF_BYCOMMAND);
+        break;
+    case MODE_PENCIL:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PENCIL, ID_PENCIL, MF_BYCOMMAND);
+        break;
+    }
+}
+
 LRESULT CALLBACK
 WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -5810,6 +5852,7 @@ WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         HANDLE_MSG(hwnd, WM_SIZE, OnSize);
         HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
         HANDLE_MSG(hwnd, WM_DROPFILES, OnDropFiles);
+        HANDLE_MSG(hwnd, WM_INITMENUPOPUP, OnInitMenuPopup);
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
@@ -5997,6 +6040,998 @@ STRINGTABLE
 
 ...(以下略)...
 ```
+
+# お絵かきソフト（paint）のさらなる改良
+
+前回でお絵かきソフトの土台ができたが、まだ機能が少なく貧弱である。
+さらに機能を追加しよう。
+
+## モードの追加
+
+では、「四角」「丸」「直線」の３つのモードを追加してみよう。
+
+`paint.h`のMODE列挙型に`MODE_RECT`、`MODE_ELLIPSE`、`MODE_LINE`の３つを追加する。
+
+```cpp
+enum MODE
+{
+    MODE_SELECT,
+    MODE_PENCIL,
+    MODE_RECT,
+    MODE_ELLIPSE,
+    MODE_LINE
+};
+extern MODE g_nMode;
+```
+
+リソーエディタで、リソースに
+`ID_RECT`→`110`、
+`ID_ELLIPSE`→`111`、
+`ID_LINE`→`112`
+の３つのコマンドIDを追加し、
+「ツール」メニューに「四角」「丸」「直線」メニュー項目を追加する。
+
+```rc
+1 MENU
+{
+    POPUP "ファイル(&F)"
+    ...(中略)...
+    POPUP "ツール(&T)"
+    {
+        MENUITEM "選択(&S)", ID_SELECT
+        MENUITEM "鉛筆(&P)", ID_PENCIL
+        MENUITEM SEPARATOR
+        MENUITEM "四角(&R)", ID_RECT
+        MENUITEM "丸(&E)", ID_ELLIPSE
+        MENUITEM "直線(&L)", ID_LINE
+    }
+}
+```
+
+さらに`canvas.cpp`で、それぞれのモードを実装する。
+
+```cpp
+struct ModeRect : IMode
+{
+    virtual void DoLButtonDown(HWND hwnd, POINT pt)
+    {
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoMouseMove(HWND hwnd, POINT pt)
+    {
+        s_pt = pt;
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    virtual void DoLButtonUp(HWND hwnd, POINT pt)
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+            HBRUSH hbrOld = SelectBrush(hMemDC, GetStockBrush(BLACK_BRUSH));
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&rc);
+            Rectangle(hMemDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hMemDC, hbrOld);
+            SelectPen(hMemDC, hPenOld);
+            SelectBitmap(hMemDC, hbmOld);
+
+            DeleteDC(hMemDC);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, GetStockPen(WHITE_PEN));
+            HBRUSH hbrOld = SelectBrush(hDC, GetStockBrush(BLACK_BRUSH));
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&rc);
+            Rectangle(hDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hDC, hbrOld);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+};
+
+struct ModeEllipse : IMode
+{
+    virtual void DoLButtonDown(HWND hwnd, POINT pt)
+    {
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoMouseMove(HWND hwnd, POINT pt)
+    {
+        s_pt = pt;
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    virtual void DoLButtonUp(HWND hwnd, POINT pt)
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+            HBRUSH hbrOld = SelectBrush(hMemDC, GetStockBrush(BLACK_BRUSH));
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&rc);
+            Ellipse(hMemDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hMemDC, hbrOld);
+            SelectPen(hMemDC, hPenOld);
+            SelectBitmap(hMemDC, hbmOld);
+
+            DeleteDC(hMemDC);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, GetStockPen(WHITE_PEN));
+            HBRUSH hbrOld = SelectBrush(hDC, GetStockBrush(BLACK_BRUSH));
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&rc);
+            Ellipse(hDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hDC, hbrOld);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+};
+
+struct ModeLine : IMode
+{
+    virtual void DoLButtonDown(HWND hwnd, POINT pt)
+    {
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoMouseMove(HWND hwnd, POINT pt)
+    {
+        s_pt = pt;
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    virtual void DoLButtonUp(HWND hwnd, POINT pt)
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            HPEN hPenOld = SelectPen(hMemDC, GetStockPen(WHITE_PEN));
+            MoveToEx(hMemDC, s_ptOld.x, s_ptOld.y, NULL);
+            LineTo(hMemDC, s_pt.x, s_pt.y);
+            SelectPen(hMemDC, hPenOld);
+            SelectBitmap(hMemDC, hbmOld);
+
+            DeleteDC(hMemDC);
+
+            InvalidateRect(hwnd, NULL, TRUE);
+        }
+        s_pt = s_ptOld = pt;
+    }
+
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, GetStockPen(WHITE_PEN));
+            MoveToEx(hDC, s_ptOld.x, s_ptOld.y, NULL);
+            LineTo(hDC, s_pt.x, s_pt.y);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+};
+
+...(中略)...
+
+void DoSetMode(MODE nMode)
+{
+    delete s_pMode;
+    switch (nMode)
+    {
+    case MODE_SELECT:
+        s_pMode = new ModeSelect();
+        break;
+    case MODE_PENCIL:
+        s_pMode = new ModePencil();
+        break;
+    case MODE_RECT:
+        s_pMode = new ModeRect();
+        break;
+    case MODE_ELLIPSE:
+        s_pMode = new ModeEllipse();
+        break;
+    case MODE_LINE:
+        s_pMode = new ModeLine();
+        break;
+    }
+    g_nMode = nMode;
+}
+
+...(中略)...
+
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+    case ID_PENCIL:
+        DoSetMode(MODE_PENCIL);
+        break;
+    case ID_RECT:
+        DoSetMode(MODE_RECT);
+        break;
+    case ID_ELLIPSE:
+        DoSetMode(MODE_ELLIPSE);
+        break;
+    case ID_LINE:
+        DoSetMode(MODE_LINE);
+        break;
+    }
+}
+```
+
+さらに`paint.cpp`を新しいモードに順応させる。
+
+```cpp
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+    case ID_SELECT:
+    case ID_PENCIL:
+    case ID_RECT:
+    case ID_ELLIPSE:
+    case ID_LINE:
+        SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
+        break;
+    }
+}
+
+...(中略)...
+
+void OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
+{
+    switch (g_nMode)
+    switch (g_nMode)
+    {
+    case MODE_SELECT:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_LINE, ID_SELECT, MF_BYCOMMAND);
+        break;
+    case MODE_PENCIL:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_LINE, ID_PENCIL, MF_BYCOMMAND);
+        break;
+    case MODE_RECT:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_LINE, ID_RECT, MF_BYCOMMAND);
+        break;
+    case MODE_ELLIPSE:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_LINE, ID_ELLIPSE, MF_BYCOMMAND);
+        break;
+    case MODE_LINE:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_LINE, ID_LINE, MF_BYCOMMAND);
+        break;
+    }
+}
+```
+
+これで３つのモードを実装できた。
+
+ここまでのソースは次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint13](https://github.com/katahiromz/paint13)
+
+
+## 色の変更
+
+線の色と、塗りつぶしの色を変更できるようにしたい。
+
+リソーエディタでコマンドIDの
+`ID_LINE_COLOR`→`113`、
+`ID_FILL_COLOR`→`114`
+を追加する。
+
+「ツール」メニューに「線の色(&C)...」「塗りつぶしの色(&F)...」メニュー項目を追加する。
+
+```
+1 MENU
+{
+    ...(中略)...
+    POPUP "ツール(&T)"
+    {
+        MENUITEM "選択(&S)", ID_SELECT
+        MENUITEM "鉛筆(&P)", ID_PENCIL
+        MENUITEM SEPARATOR
+        MENUITEM "四角(&R)", ID_RECT
+        MENUITEM "丸(&E)", ID_ELLIPSE
+        MENUITEM "直線(&L)", ID_LINE
+        MENUITEM SEPARATOR
+        MENUITEM "線の色(&C)...", ID_LINE_COLOR
+        MENUITEM "塗りつぶしの色(&F)...", ID_FILL_COLOR
+    }
+}
+```
+
+`paint.cpp`を新しいコマンドに順応させる。
+
+```cpp
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+    case ID_SELECT:
+    case ID_PENCIL:
+    case ID_RECT:
+    case ID_ELLIPSE:
+    case ID_LINE:
+    case ID_LINE_COLOR:
+    case ID_FILL_COLOR:
+        SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
+        break;
+    }
+}
+```
+
+`canvas.cpp`に、ペンとブラシと色の変数を追加する。
+
+```cpp
+static COLORREF s_rgbLine = RGB(255, 255, 255);
+static COLORREF s_rgbFill = RGB(0, 0, 0);
+static HPEN s_hPen = CreatePen(PS_SOLID, 1, RGB(255, 255, 255));
+static HBRUSH s_hBrush = CreateSolidBrush(RGB(0, 0, 0));
+```
+
+ユーザに色を選択させる関数を追加する。
+
+```cpp
+void DoChooseColor(HWND hwnd, BOOL bFill)
+{
+    static COLORREF s_custom_colors[16];
+
+    CHOOSECOLOR cc = { sizeof(cc) };
+    cc.hwndOwner = hwnd;
+
+    if (bFill)
+        cc.rgbResult = s_rgbFill;
+    else
+        cc.rgbResult = s_rgbLine;
+
+    cc.lpCustColors = s_custom_colors;
+    cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+    if (ChooseColor(&cc))
+    {
+        if (bFill)
+        {
+            s_rgbFill = cc.rgbResult;
+            DeleteObject(s_hBrush);
+            s_hBrush = CreateSolidBrush(s_rgbFill);
+        }
+        else
+        {
+            s_rgbLine = cc.rgbResult;
+            DeleteObject(s_hPen);
+            s_hPen = CreatePen(PS_SOLID, 1, s_rgbLine);
+        }
+    }
+}
+```
+
+`WM_DESTROY`メッセージが来たらペンとブラシを破棄する。
+
+```cpp
+static void OnDestroy(HWND hwnd)
+{
+    DeleteObject(g_hbm);
+    g_hbm = NULL;
+
+    DeleteObject(s_hPen);
+    s_hPen = NULL;
+
+    DeleteObject(s_hBrush);
+    s_hBrush = NULL;
+}
+```
+
+コマンドを実装する。
+
+```cpp
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+        break;
+    case ID_LINE_COLOR:
+        DoChooseColor(hwnd, FALSE);
+        break;
+    case ID_FILL_COLOR:
+        DoChooseColor(hwnd, TRUE);
+        break;
+    }
+}
+```
+
+そして、線を引くときと、塗りつぶすときに、これらのペンとブラシを使用するようにする。
+`GetStockPen(WHITE_PEN)`を`s_hPen`で置換する。
+`GetStockBrush(BLACK_BRUSH)`を`s_hBrush`で置換する。
+
+![ペイントの色](images/paint-color.png)\
+
+これで色が指定できるようになった。
+
+ここまでのソースは次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint14](https://github.com/katahiromz/paint14)
+
+## キャンバスのサイズ変更
+
+キャンバスのサイズを変更できるようにしたい。
+
+リソーエディタでコマンドIDの`ID_CANVAS_SIZE`→`115`と、
+リソースIDの`IDD_SIZE`→`100`を追加し、
+「ツール」メニューにメニュー項目「キャンバス サイズ(&V)...」を追加する。
+
+```rc
+1 MENU
+{
+    ...(中略)...
+    POPUP "ツール(&T)"
+    {
+        ...(中略)...
+        MENUITEM "塗りつぶしの色(&F)...", ID_FILL_COLOR
+        MENUITEM SEPARATOR
+        MENUITEM "キャンバス サイズ(&V)...", ID_CANVAS_SIZE
+    }
+}
+```
+
+リソーエディタで次のようなダイアログ`IDD_SIZE`を追加する。
+
+![キャンバスのサイズ変更](images/paint-dialog-design.png)\
+
+```rc
+LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
+
+IDD_SIZE DIALOG 0, 0, 163, 80
+CAPTION "キャンバスのサイズ変更"
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+FONT 9, "MS UI Gothic"
+{
+    LTEXT "幅(&W):", -1, 7, 9, 33, 13
+    EDITTEXT edt1, 46, 8, 60, 14
+    LTEXT "ピクセル", -1, 116, 9, 32, 12
+    LTEXT "高さ(&H):", -1, 7, 37, 32, 11
+    EDITTEXT edt2, 46, 35, 60, 14
+    LTEXT "ピクセル", -1, 115, 37, 32, 12
+    DEFPUSHBUTTON "OK", IDOK, 7, 54, 60, 14
+    PUSHBUTTON "キャンセル", IDCANCEL, 78, 55, 60, 14
+}
+```
+
+`paint.cpp`の`OnCommand`を、新しいコマンドIDの`ID_CANVAS_SIZE`に順応させる。
+
+```cpp
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+    case ID_LINE_COLOR:
+    case ID_FILL_COLOR:
+    case ID_CANVAS_SIZE:
+        SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
+        break;
+    }
+}
+```
+
+`canvas.cpp`の`OnCommand`に新しいコマンドIDの`ID_CANVAS_SIZE`を追加する。
+
+```cpp
+static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    ...(中略)...
+    case ID_FILL_COLOR:
+        DoChooseColor(hwnd, TRUE);
+        break;
+    case ID_CANVAS_SIZE:
+        OnCanvasSize(hwnd);
+        break;
+}
+```
+
+`canvas.cpp`に次のようなコードを追記する。
+
+```cpp
+BOOL Size_OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
+{
+    BITMAP bm;
+    GetObject(g_hbm, sizeof(bm), &bm);
+
+    SetDlgItemInt(hwnd, edt1, bm.bmWidth, FALSE);
+    SetDlgItemInt(hwnd, edt2, bm.bmHeight, FALSE);
+    return TRUE;
+}
+
+void Size_OnOK(HWND hwnd)
+{
+    BOOL bTrans;
+
+    INT cx = GetDlgItemInt(hwnd, edt1, &bTrans, FALSE);
+    if (!bTrans)
+    {
+        MessageBox(hwnd, TEXT("ERROR"), NULL, MB_ICONERROR);
+        return;
+    }
+
+    INT cy = GetDlgItemInt(hwnd, edt1, &bTrans, FALSE);
+    if (!bTrans)
+    {
+        MessageBox(hwnd, TEXT("ERROR"), NULL, MB_ICONERROR);
+        return;
+    }
+
+    HBITMAP hbm = DoCreate24BppBitmap(cx, cy);
+    RECT rc;
+    SetRect(&rc, 0, 0, cx, cy);
+    DoPutSubImage(hbm, &rc, g_hbm);
+    DeleteObject(g_hbm);
+    g_hbm = hbm;
+
+    EndDialog(hwnd, IDOK);
+}
+
+void Size_OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
+{
+    switch (id)
+    {
+    case IDOK:
+        Size_OnOK(hwnd);
+        break;
+    case IDCANCEL:
+        EndDialog(hwnd, id);
+        break;
+    }
+}
+
+INT_PTR CALLBACK
+SizeDialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        HANDLE_MSG(hwnd, WM_INITDIALOG, Size_OnInitDialog);
+        HANDLE_MSG(hwnd, WM_COMMAND, Size_OnCommand);
+    }
+    return 0;
+}
+
+static void OnCanvasSize(HWND hwnd)
+{
+    if (DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_SIZE),
+                  hwnd, SizeDialogProc) == IDOK)
+    {
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+}
+```
+
+これでキャンバスサイズを変更できるようになった。
+
+ここまでのソースは次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint15](https://github.com/katahiromz/paint15)
+
+## キャンバスをスクロール可能にする
+
+例えば、キャンバスのサイズが1000×1000ピクセルのような大きなサイズのとき、キャンバスはメインウィンドウをはみ出るかもしれない。
+画像がウィンドウよりも大きいときでも、スクロール（画面の中身をずらす）によって画像全体を閲覧できるようにしたい。
+
+まず、`canvas.cpp`に`DoUpdateCanvas`という関数を追加する。
+
+```cpp
+void DoUpdateCanvas(HWND hwnd, HBITMAP hbm, BOOL bResetPos = FALSE)
+{
+    if (g_hbm != hbm)
+    {
+        DeleteObject(g_hbm);
+        g_hbm = hbm;
+    }
+
+    BITMAP bm;
+    GetObject(hbm, sizeof(bm), &bm);
+
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    {
+        SCROLLINFO si = { sizeof(si) };
+        si.fMask = SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL;
+        si.nMin = 0;
+        si.nMax = bm.bmWidth;
+        si.nPage = rc.right - rc.left;
+        if (bResetPos)
+        {
+            si.fMask |= SIF_POS;
+            si.nPos = 0;
+        }
+        SetScrollInfo(hwnd, SB_HORZ, &si, TRUE);
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+
+    {
+        SCROLLINFO si = { sizeof(si) };
+        si.fMask = SIF_RANGE | SIF_PAGE | SIF_DISABLENOSCROLL;
+        si.nMin = 0;
+        si.nMax = bm.bmHeight;
+        si.nPage = rc.bottom - rc.top;
+        if (bResetPos)
+        {
+            si.fMask |= SIF_POS;
+            si.nPos = 0;
+        }
+        SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
+        InvalidateRect(hwnd, NULL, TRUE);
+    }
+}
+```
+
+この関数は、キャンバスのスクロール情報を更新する。
+キャンバスのビットマップハンドルやサイズが更新されたら、この関数を呼ぶことにする。
+
+次に`WM_HSCROLL`、`WM_VSCROLL`、`WM_MOUSEWHEEL`、`WM_SIZE`メッセージの処理を実装する。
+
+```cpp
+static void OnHScroll(HWND hwnd, HWND hwndCtl, UINT code, int pos)
+{
+    SCROLLINFO si = { sizeof(si) };
+    si.fMask = SIF_ALL;
+    GetScrollInfo(hwnd, SB_HORZ, &si);
+
+    INT nOldPos = si.nPos;
+    INT nNewPos = nOldPos;
+    switch (code)
+    {
+    case SB_LINELEFT:
+        --nNewPos;
+        break;
+    case SB_LINERIGHT:
+        ++nNewPos;
+        break;
+    case SB_PAGELEFT:
+        nNewPos -= si.nPage;
+        break;
+    case SB_PAGERIGHT:
+        nNewPos += si.nPage;
+        break;
+    case SB_THUMBPOSITION:
+    case SB_THUMBTRACK:
+        nNewPos = pos;
+        break;
+    }
+
+    if (nNewPos < si.nMin)
+        nNewPos = si.nMin;
+    if (nNewPos > si.nMax - si.nPage)
+        nNewPos = si.nMax - si.nPage;
+
+    si.fMask = SIF_POS;
+    si.nPos = nNewPos;
+    SetScrollInfo(hwnd, SB_HORZ, &si, TRUE);
+    InvalidateRect(hwnd, NULL, TRUE);
+}
+
+static void OnVScroll(HWND hwnd, HWND hwndCtl, UINT code, int pos)
+{
+    SCROLLINFO si = { sizeof(si) };
+    si.fMask = SIF_ALL;
+    GetScrollInfo(hwnd, SB_VERT, &si);
+
+    INT nOldPos = si.nPos;
+    INT nNewPos = nOldPos;
+    switch (code)
+    {
+    case SB_LINEUP:
+        --nNewPos;
+        break;
+    case SB_LINEDOWN:
+        ++nNewPos;
+        break;
+    case SB_PAGEUP:
+        nNewPos -= si.nPage;
+        break;
+    case SB_PAGEDOWN:
+        nNewPos += si.nPage;
+        break;
+    case SB_THUMBPOSITION:
+    case SB_THUMBTRACK:
+        nNewPos = pos;
+        break;
+    }
+
+    if (nNewPos < si.nMin)
+        nNewPos = si.nMin;
+    if (nNewPos > si.nMax - si.nPage)
+        nNewPos = si.nMax - si.nPage;
+
+    si.fMask = SIF_POS;
+    si.nPos = nNewPos;
+    SetScrollInfo(hwnd, SB_VERT, &si, TRUE);
+    InvalidateRect(hwnd, NULL, TRUE);
+}
+
+static void OnMouseWheel(HWND hwnd, int xPos, int yPos, int zDelta, UINT fwKeys)
+{
+    INT x = GetScrollPos(hwnd, SB_HORZ);
+    INT y = GetScrollPos(hwnd, SB_VERT);
+    if (fwKeys & MK_SHIFT)
+        x += -zDelta;
+    else
+        y += -zDelta;
+    SetScrollPos(hwnd, SB_HORZ, x, TRUE);
+    SetScrollPos(hwnd, SB_VERT, y, TRUE);
+    InvalidateRect(hwnd, NULL, TRUE);
+}
+
+static void OnSize(HWND hwnd, UINT state, int cx, int cy)
+{
+    DoUpdateCanvas(hwnd, g_hbm, FALSE);
+}
+
+LRESULT CALLBACK
+CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+        ...(中略)...
+        HANDLE_MSG(hwnd, WM_LBUTTONUP, OnLButtonUp);
+        HANDLE_MSG(hwnd, WM_HSCROLL, OnHScroll);
+        HANDLE_MSG(hwnd, WM_VSCROLL, OnVScroll);
+        HANDLE_MSG(hwnd, WM_MOUSEWHEEL, OnMouseWheel);
+        HANDLE_MSG(hwnd, WM_SIZE, OnSize);
+        case WM_CAPTURECHANGED:
+            s_bDragging = FALSE;
+            break;
+    default:
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+    return 0;
+}
+```
+
+これでキャンバスのサイズが変更されたときやスクロールが起きたときに、適切に処理ができる。
+
+次に、マウスメッセージが起きたとき、少し位置をずらさなければいけない。
+
+```cpp
+static void OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+{
+    if (fDoubleClick || s_bDragging)
+        return;
+
+    s_bDragging = TRUE;
+    SetCapture(hwnd);
+
+    POINT pt = { x, y };
+    pt.x += GetScrollPos(hwnd, SB_HORZ);
+    pt.y += GetScrollPos(hwnd, SB_VERT);
+    s_pMode->DoLButtonDown(hwnd, pt);
+}
+
+static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    pt.x += GetScrollPos(hwnd, SB_HORZ);
+    pt.y += GetScrollPos(hwnd, SB_VERT);
+    s_pMode->DoMouseMove(hwnd, pt);
+}
+
+static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+{
+    if (!s_bDragging)
+        return;
+
+    POINT pt = { x, y };
+    pt.x += GetScrollPos(hwnd, SB_HORZ);
+    pt.y += GetScrollPos(hwnd, SB_VERT);
+    s_pMode->DoLButtonUp(hwnd, pt);
+
+    ReleaseCapture();
+    s_bDragging = FALSE;
+}
+```
+
+`WM_PAINT`の処理でも、描画を少しずらす必要がある。
+
+```cpp
+static void OnPaint(HWND hwnd)
+{
+    BITMAP bm;
+    GetObject(g_hbm, sizeof(bm), &bm);
+
+    PAINTSTRUCT ps;
+    if (HDC hDC = BeginPaint(hwnd, &ps))
+    {
+        if (HDC hMemDC = CreateCompatibleDC(NULL))
+        {
+            HBITMAP hbmOld = SelectBitmap(hMemDC, g_hbm);
+            INT x = -GetScrollPos(hwnd, SB_HORZ);
+            INT y = -GetScrollPos(hwnd, SB_VERT);
+            BitBlt(hDC, x, y, bm.bmWidth, bm.bmHeight,
+                   hMemDC, 0, 0, SRCCOPY);
+            SelectBitmap(hMemDC, hbmOld);
+
+            s_pMode->DoPostPaint(hwnd, hDC);
+
+            DeleteDC(hMemDC);
+        }
+        EndPaint(hwnd, &ps);
+    }
+}
+```
+
+利便のために、`WM_CREATE`の処理でキャンバスのウィンドウハンドルを保持しておく。
+キャンバスを大きめ（500×500ピクセル）に設定する。
+
+```cpp
+static HWND s_hCanvasWnd = NULL;
+...(中略)...
+static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
+{
+    s_hCanvasWnd = hwnd;
+    DoUpdateCanvas(hwnd, DoCreate24BppBitmap(500, 500), TRUE);
+    return TRUE;
+}
+```
+
+Size_OnOKで保存したウィンドウハンドルを次のように使用する。
+
+```cpp
+void Size_OnOK(HWND hwnd)
+{
+    BOOL bTrans;
+    ...(中略)...
+    SetRect(&rc, 0, 0, cx, cy);
+    DoPutSubImage(hbm, &rc, g_hbm);
+    DoUpdateCanvas(s_hCanvasWnd, hbm, TRUE);
+
+    EndDialog(hwnd, IDOK);
+}
+```
+
+スクロール位置でずらすために、
+`ModeRect::DoPostPaint`に修正が必要だ。
+
+```cpp
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, s_hPen);
+            HBRUSH hbrOld = SelectBrush(hDC, s_hBrush);
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            INT x = GetScrollPos(hwnd, SB_HORZ);
+            INT y = GetScrollPos(hwnd, SB_VERT);
+            OffsetRect(&rc, -x, -y);
+            DoNormalizeRect(&rc);
+            Rectangle(hDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hDC, hbrOld);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+```
+
+また、`ModeEllipse::DoPostPaint`にも修正が必要だ。
+
+```cpp
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, s_hPen);
+            HBRUSH hbrOld = SelectBrush(hDC, s_hBrush);
+            RECT rc;
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+            DoNormalizeRect(&rc);
+            INT x = GetScrollPos(hwnd, SB_HORZ);
+            INT y = GetScrollPos(hwnd, SB_VERT);
+            OffsetRect(&rc, -x, -y);
+            Ellipse(hDC, rc.left, rc.top, rc.right, rc.bottom);
+            SelectBrush(hDC, hbrOld);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+```
+
+また、`ModeLine::DoPostPaint`にも修正が必要だ。
+
+```cpp
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        if (memcmp(&s_pt, &s_ptOld, sizeof(POINT)) != 0)
+        {
+            HPEN hPenOld = SelectPen(hDC, s_hPen);
+            RECT rc;
+            POINT pt1 = { s_ptOld.x, s_ptOld.y};
+            POINT pt2 = { s_pt.x, s_pt.y };
+            INT x = GetScrollPos(hwnd, SB_HORZ);
+            INT y = GetScrollPos(hwnd, SB_VERT);
+            pt1.x += -x;
+            pt2.x += -x;
+            pt1.y += -y;
+            pt2.y += -y;
+            MoveToEx(hDC, pt1.x, pt1.y, NULL);
+            LineTo(hDC, pt2.x, pt2.y);
+            SelectPen(hDC, hPenOld);
+        }
+    }
+```
+
+`ModeSelect::DoPostPaint`にも修正が必要だ。
+
+```cpp
+    virtual void DoPostPaint(HWND hwnd, HDC hDC)
+    {
+        RECT rc;
+        INT x = GetScrollPos(hwnd, SB_HORZ);
+        INT y = GetScrollPos(hwnd, SB_VERT);
+
+        if (s_hbmFloating)
+        {
+            rc = s_rcFloating;
+        }
+        else
+        {
+            SetRect(&rc, s_ptOld.x, s_ptOld.y, s_pt.x, s_pt.y);
+        }
+        DoNormalizeRect(&rc);
+
+        if (!IsRectEmpty(&s_rcFloating) && s_hbmFloating)
+        {
+            if (HDC hMemDC = CreateCompatibleDC(NULL))
+            {
+                HBITMAP hbmOld = SelectBitmap(hMemDC, s_hbmFloating);
+                {
+                    BitBlt(hDC, s_rcFloating.left - x, s_rcFloating.top - y,
+                        s_rcFloating.right - s_rcFloating.left,
+                        s_rcFloating.bottom - s_rcFloating.top,
+                        hMemDC, 0, 0, SRCCOPY);
+                }
+                SelectBitmap(hMemDC, hbmOld);
+                DeleteDC(hMemDC);
+            }
+        }
+
+        OffsetRect(&rc, -x, -y);
+        DrawFocusRect(hDC, &rc);
+    }
+```
+
+これでスクロールはバッチリだ。
+
+ここまでのソースは次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint16](https://github.com/katahiromz/paint16)
 
 # 結び
 
