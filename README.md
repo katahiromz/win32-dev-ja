@@ -3043,11 +3043,11 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 
 # お絵かきソフトを作る（paint）
 
-次はお絵かきソフトを作ろう。マウスでお絵かきできるかな。
+次はお絵かきソフト「ペイント」を作ろう。マウスでお絵かきできるかな。
 
 ## 初期のソース
 
-初期のソースをここに掲載する。
+「ペイント」の初期のソースをここに掲載する。
 
 - [https://github.com/katahiromz/paint1](https://github.com/katahiromz/paint1)
 
@@ -6693,7 +6693,7 @@ void DoUpdateCanvas(HWND hwnd, HBITMAP hbm, BOOL bResetPos = FALSE)
 ```
 
 この関数は、キャンバスのスクロール情報を更新する。
-キャンバスのビットマップハンドルやサイズが更新されたら、この関数を呼ぶことにする。
+キャンバスのビットマップハンドルやサイズを更新するときに、この関数を呼ぶことにする。
 
 次に`WM_HSCROLL`、`WM_VSCROLL`、`WM_MOUSEWHEEL`、`WM_SIZE`メッセージの処理を実装する。
 
@@ -6903,7 +6903,7 @@ static BOOL OnCreate(HWND hwnd, LPCREATESTRUCT lpCreateStruct)
 }
 ```
 
-Size_OnOKで保存したウィンドウハンドルを次のように使用する。
+保存したウィンドウハンドルを`Size_OnOK`で次のように使用する。
 
 ```cpp
 void Size_OnOK(HWND hwnd)
@@ -6941,7 +6941,7 @@ void Size_OnOK(HWND hwnd)
     }
 ```
 
-また、`ModeEllipse::DoPostPaint`にも修正が必要だ。
+`ModeEllipse::DoPostPaint`にも修正が必要だ。
 
 ```cpp
     virtual void DoPostPaint(HWND hwnd, HDC hDC)
@@ -7032,6 +7032,72 @@ void Size_OnOK(HWND hwnd)
 ここまでのソースは次のリンクに掲載する。
 
 - [https://github.com/katahiromz/paint16](https://github.com/katahiromz/paint16)
+
+## ちらつきをなくす
+
+このペイントで鉛筆で線を書いているとき、どうも画面がちらつく。
+
+標準のウィンドウの描画方法では、
+`WM_ERASEBKGND`メッセージの処理で`hbrBackground`の背景ブラシで背景を塗りつぶし、
+その上を`WM_PAINT`メッセージの処理で描画するようになっている。
+ここで、`WM_ERASEBKGND`をスキップして`WM_PAINT`で「ダブルバッファリング」すれば、
+ちらつきをなくすことができる。ダブルバッファリングとは、ビットマップをバッファとして使って
+描画途中の状態を表示せずに、最後にバッファを使って一気に描画することを意味する。
+
+まず、`paint.cpp`のキャンバスウィンドウクラスの`RegisterClass`で`hbrBackground`にNULLを指定する。
+これで`WM_ERASEBKGND`をスキップすることができる。
+
+次に、`canvas.cpp`の`OnPaint`を次のように書き換える。
+
+```cpp
+static void OnPaint(HWND hwnd)
+{
+    RECT rc;
+    GetClientRect(hwnd, &rc);
+
+    INT cx = rc.right - rc.left;
+    INT cy = rc.bottom - rc.top;
+    OffsetRect(&rc, -rc.left, -rc.top);
+
+    BITMAP bm;
+    GetObject(g_hbm, sizeof(bm), &bm);
+
+    PAINTSTRUCT ps;
+    if (HDC hDC = BeginPaint(hwnd, &ps))
+    {
+        if (HBITMAP hbmBuffer = CreateCompatibleBitmap(hDC, cx, cy))
+        {
+            if (HDC hMemDC1 = CreateCompatibleDC(NULL))
+            {
+                HBITMAP hbm1Old = SelectBitmap(hMemDC1, hbmBuffer);
+                FillRect(hMemDC1, &rc, GetStockBrush(GRAY_BRUSH));
+                if (HDC hMemDC2 = CreateCompatibleDC(NULL))
+                {
+                    HBITMAP hbm2Old = SelectBitmap(hMemDC2, g_hbm);
+                    INT x = -GetScrollPos(hwnd, SB_HORZ);
+                    INT y = -GetScrollPos(hwnd, SB_VERT);
+                    BitBlt(hMemDC1, x, y, bm.bmWidth, bm.bmHeight,
+                           hMemDC2, 0, 0, SRCCOPY);
+                    s_pMode->DoPostPaint(hwnd, hMemDC1);
+                    SelectBitmap(hMemDC2, hbm2Old);
+                    DeleteDC(hMemDC2);
+                }
+                BitBlt(hDC, 0, 0, cx, cy, hMemDC1, 0, 0, SRCCOPY);
+                SelectBitmap(hMemDC1, hbm1Old);
+                DeleteDC(hMemDC1);
+            }
+            DeleteObject(hbmBuffer);
+        }
+        EndPaint(hwnd, &ps);
+    }
+}
+```
+
+これでちらつきなしにキャンバスが描画される。
+
+ここまでのソースは次のリンクに掲載する。
+
+- [https://github.com/katahiromz/paint17](https://github.com/katahiromz/paint17)
 
 # 結び
 
