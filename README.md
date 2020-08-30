@@ -359,6 +359,7 @@ ninja
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
@@ -400,6 +401,7 @@ WinMain(HINSTANCE   hInstance,
 
 急にプログラムがややこしくなったが、１つ１つ理解していけば問題ない。
 `#include <windows.h>`は、Win32 APIを使うために必要なヘッダをインクルードする。`#include <windowsx.h>`は、`HANDLE_MSG`マクロを使用するために必要である。`HANDLE_MSG`マクロは、メッセージハンドラとウィンドウプロシージャ（もしくはダイアログプロシージャ）を結び付けるのに使う。メッセージハンドラとは、ウィンドウで発生したイベントに応じて発生するメッセージを処理する関数である。ダイアログプロシージャは、ここでは`DialogProc`関数のことである。ダイアログプロシージャは典型的なイベント駆動型プログラミングを実装する。`WM_INITDIALOG`メッセージはダイアログの初期化のときに発生する。`WM_COMMAND`メッセージはダイアログでコマンドが発生したとき（ボタンが押されたときなど）に発生する。
+`#include <strsafe.h>`については後述する。
 
 ここでは、C言語で慣れ親しんだ`main`関数の代わりに`WinMain`という関数を使う。`main`関数を使うと黒い画面が表示されるが、ウィンドウアプリでは黒い画面は不要なので`main`関数は使わない。`DialogBox`関数はダイアログを表示するAPI関数である。`HWND`は、ウィンドウのハンドルを格納する型である。`UINT`は`unsigned int`型と同じである。`WPARAM`や`LPARAM`は、ポインタと同じサイズの整数型である。`DialogProc`関数では`WM_INITDIALOG`メッセージと`WM_COMMAND`メッセージを処理している。`DialogBox`や`WM_INITDIALOG`などの意味については、それをインターネットで検索すれば出てくる。`MAKEINTRESOURCE`マクロは、整数のリソース名を指定するのに使う。
 
@@ -569,6 +571,7 @@ WinMain(HINSTANCE   hInstance,
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 static HICON s_hIcon = NULL;
 static HICON s_hIconSmall = NULL;
@@ -769,13 +772,19 @@ void OnOK(HWND hwnd)
 {
     INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE) * 2;
     WCHAR szText[64];
-    wsprintfW(szText, L"%d", n);
+    StringCbPrintfW(szText, sizeof(szText), L"%d", n);
     MessageBoxW(hwnd, szText, L"Nibai", MB_ICONINFORMATION);
     EndDialog(hwnd, IDOK);
 }
 ```
 
-テキストボックスに入力された整数を取得するには、`GetDlgItemInt`というAPI 関数が用意されているのでこれを使う。`wsprintfW`はC言語の`sprintf`に似た関数だが、Unicodeに対応しているところと浮動小数点数に対応していないところが違う。C言語の文字列リテラルの最初に`L`が付いていると、Unicode文字列になる。よって`L"%d"`は、Unicode文字列リテラルである。`MessageBoxW`関数はメッセージボックスを表示してボタンが押されるまで待つ関数`MessageBox`のUnicode版である。
+テキストボックスに入力された整数を取得するには、`GetDlgItemInt`というAPI 関数が用意されているのでこれを使う。
+`StringCbPrintfW`は`<strsafe.h>`で宣言されていて、C言語の`sprintf`に似た関数だが、Unicodeに対応しているところとバッファサイズを指定できるところが違う。
+バッファサイズの指定により、バッファオーバーフローを回避できる。
+`StringCbPrintfW`の`Cb`とは、`count bytes`の略でバイト数を意味する。第二引数に`sizeof(szText)`を指定するので`Cb`である。
+
+C言語の文字列リテラルの最初に`L`が付いていると、Unicode文字列になる。
+よって`L"%d"`は、Unicode文字列リテラルである。`MessageBoxW`関数はメッセージボックスを表示してボタンが押されるまで待つ関数`MessageBox`のUnicode版である。
 
 では`ninja`を実行して再びビルドして`dialog.exe`を実行しよう。
 
@@ -788,6 +797,7 @@ void OnOK(HWND hwnd)
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 static HICON s_hIcon = NULL;
 static HICON s_hIconSmall = NULL;
@@ -809,7 +819,7 @@ void OnOK(HWND hwnd)
 {
     INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE) * 2;
     WCHAR szText[64];
-    wsprintfW(szText, L"%d", n);
+    StringCbPrintfW(szText, sizeof(szText), L"%d", n);
     MessageBoxW(hwnd, szText, L"Nibai", MB_ICONINFORMATION);
     EndDialog(hwnd, IDOK);
 }
@@ -1006,7 +1016,7 @@ void OnOK(HWND hwnd)
 {
     INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE) * 2;
     WCHAR szText[64];
-    wsprintfW(szText, L"%d", n);
+    StringCbPrintfW(szText, sizeof(szText), L"%d", n);
     MessageBoxW(hwnd, szText, LoadStringDx(100), MB_ICONINFORMATION);
     EndDialog(hwnd, IDOK);
 }
@@ -1021,6 +1031,7 @@ void OnOK(HWND hwnd)
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 static HICON s_hIcon = NULL;
 static HICON s_hIconSmall = NULL;
@@ -1055,7 +1066,7 @@ void OnOK(HWND hwnd)
 {
     INT n = GetDlgItemInt(hwnd, edt1, NULL, TRUE) * 2;
     WCHAR szText[64];
-    wsprintfW(szText, L"%d", n);
+    StringCbPrintfW(szText, sizeof(szText), L"%d", n);
     MessageBoxW(hwnd, szText, LoadStringDx(100), MB_ICONINFORMATION);
     EndDialog(hwnd, IDOK);
 }
@@ -1186,6 +1197,7 @@ WinMain(HINSTANCE   hInstance,
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <strsafe.h>
 
 static HICON s_hIcon = NULL;
 ...
@@ -1239,6 +1251,7 @@ void OnOK(HWND hwnd)
 #include <windows.h>
 #include <windowsx.h>
 #include <commctrl.h>
+#include <strsafe.h>
 
 static HICON s_hIcon = NULL;
 static HICON s_hIconSmall = NULL;
@@ -1407,6 +1420,7 @@ target_link_libraries(notepad PRIVATE comctl32)
 #include <windowsx.h>
 #include <commctrl.h>
 #include <cstdio>
+#include <strsafe.h>
 
 static const TCHAR s_szName[] = TEXT("My Notepad");
 
@@ -1693,6 +1707,7 @@ void OnSize(HWND hwnd, UINT state, int cx, int cy)
 #include <windowsx.h>
 #include <commctrl.h>
 #include <cstdio>
+#include <strsafe.h>
 
 static const TCHAR s_szName[] = TEXT("My Notepad");
 
@@ -1984,6 +1999,7 @@ void OnSave(HWND hwnd)
 #include <commdlg.h>
 #include <cstdio>
 #include <string>
+#include <strsafe.h>
 
 static const TCHAR s_szName[] = TEXT("My Notepad");
 
@@ -2583,8 +2599,8 @@ void OnInsertDateTime(HWND hwnd)
     TCHAR szText[64];
     SYSTEMTIME st;
     GetLocalTime(&st);
-    wsprintf(szText, TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
-             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+    StringCbPrintf(szText, sizeof(szText), TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
+                   st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 
     HWND hEdit = GetDlgItem(hwnd, edt1);
     SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)szText);
@@ -2627,6 +2643,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 #include <commdlg.h>
 #include <cstdio>
 #include <string>
+#include <strsafe.h>
 #include "resource.h"
 
 static const TCHAR s_szName[] = TEXT("My Notepad");
@@ -2767,8 +2784,8 @@ void OnInsertDateTime(HWND hwnd)
     TCHAR szText[64];
     SYSTEMTIME st;
     GetLocalTime(&st);
-    wsprintf(szText, TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
-             st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+    StringCbPrintf(szText, sizeof(szText), TEXT("%04u.%02u.%02u %02u:%02u:%02u"),
+                   st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 
     HWND hEdit = GetDlgItem(hwnd, edt1);
     SendMessage(hEdit, EM_REPLACESEL, TRUE, (LPARAM)szText);
@@ -3034,6 +3051,7 @@ target_link_libraries(notepad PRIVATE comctl32 comdlg32)
 #include <commdlg.h>
 #include <cstdio>
 #include <string>
+#include <strsafe.h>
 #include "resource.h"
 
 LPTSTR LoadStringDx(INT nID);
@@ -3322,6 +3340,7 @@ CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 #define BM_MAGIC 0x4D42  /* 'BM' */
 
@@ -4929,6 +4948,7 @@ target_link_libraries(paint PRIVATE comctl32 comdlg32)
 #include <commdlg.h>
 #include <cstdio>
 #include <string>
+#include <strsafe.h>
 #include "resource.h"
 
 LPTSTR LoadStringDx(INT nID);
@@ -4972,6 +4992,7 @@ struct IMode
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
+#include <strsafe.h>
 
 #define BM_MAGIC 0x4D42  /* 'BM' */
 
