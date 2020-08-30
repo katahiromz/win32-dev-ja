@@ -7054,10 +7054,7 @@ static void OnPaint(HWND hwnd)
 {
     RECT rc;
     GetClientRect(hwnd, &rc);
-
-    INT cx = rc.right - rc.left;
-    INT cy = rc.bottom - rc.top;
-    OffsetRect(&rc, -rc.left, -rc.top);
+    INT cx = rc.right - rc.left, cy = rc.bottom - rc.top;
 
     BITMAP bm;
     GetObject(g_hbm, sizeof(bm), &bm);
