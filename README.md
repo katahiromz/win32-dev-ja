@@ -3189,7 +3189,7 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_DELETE:
     case ID_SELECT_ALL:
     case ID_SELECT:
-    case ID_PEN:
+    case ID_PENCIL:
         SendMessage(s_hCanvasWnd, WM_COMMAND, id, 0);
         break;
     }
@@ -3316,7 +3316,7 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SELECT:
         // TODO:
         break;
-    case ID_PEN:
+    case ID_PENCIL:
         // TODO:
         break;
     }
@@ -3340,7 +3340,6 @@ CanvasWndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
-#include <strsafe.h>
 
 #define BM_MAGIC 0x4D42  /* 'BM' */
 
@@ -3634,7 +3633,7 @@ HGLOBAL DIBFromBitmap(HBITMAP hbm)
 #define ID_DELETE                           106
 #define ID_SELECT_ALL                       107
 #define ID_SELECT                           108
-#define ID_PEN                              109
+#define ID_PENCIL                           109
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
@@ -3699,7 +3698,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
     POPUP "ツール(&T)"
     {
         MENUITEM "選択(&S)", ID_SELECT
-        MENUITEM "鉛筆(&P)", ID_PEN
+        MENUITEM "鉛筆(&P)", ID_PENCIL
     }
 }
 
@@ -4187,7 +4186,7 @@ BOOL DoSave(HWND hwnd, LPCTSTR pszFile)
 enum MODE
 {
     MODE_SELECT,
-    MODE_DRAW
+    MODE_PENCIL
 };
 extern MODE g_nMode;
 ```
@@ -4196,7 +4195,7 @@ extern MODE g_nMode;
 
 ```cpp
 
-MODE g_nMode = MODE_DRAW;
+MODE g_nMode = MODE_PENCIL;
 static POINT s_pt;
 ...
 
@@ -4256,7 +4255,7 @@ static void OnMouseMove(HWND hwnd, int x, int y, UINT keyFlags)
         return;
 
     POINT pt = { x, y };
-    if (g_nMode == MODE_DRAW)
+    if (g_nMode == MODE_PENCIL)
     {
         if (HDC hMemDC = CreateCompatibleDC(NULL))
         {
@@ -4291,7 +4290,7 @@ static void OnLButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
         return;
 
     POINT pt = { x, y };
-    if (g_nMode == MODE_DRAW)
+    if (g_nMode == MODE_PENCIL)
     {
         if (HDC hMemDC = CreateCompatibleDC(NULL))
         {
@@ -4332,8 +4331,8 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SELECT:
         g_nMode = MODE_SELECT;
         break;
-    case ID_PEN:
-        g_nMode = MODE_DRAW;
+    case ID_PENCIL:
+        g_nMode = MODE_PENCIL;
         break;
     }
 }
@@ -4598,7 +4597,7 @@ void DoSetMode(MODE nMode)
     case MODE_SELECT:
         s_pMode = new ModeSelect();
         break;
-    case MODE_DRAW:
+    case MODE_PENCIL:
         s_pMode = new ModeDraw();
         break;
     }
@@ -4675,8 +4674,8 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SELECT:
         DoSetMode(MODE_SELECT);
         break;
-    case ID_PEN:
-        DoSetMode(MODE_DRAW);
+    case ID_PENCIL:
+        DoSetMode(MODE_PENCIL);
         break;
     }
 }
@@ -4897,10 +4896,10 @@ static void OnInitMenuPopup(HWND hwnd, HMENU hMenu, UINT item, BOOL fSystemMenu)
     switch (g_nMode)
     {
     case MODE_SELECT:
-        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PEN, ID_SELECT, MF_BYCOMMAND);
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PENCIL, ID_SELECT, MF_BYCOMMAND);
         break;
-    case MODE_DRAW:
-        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PEN, ID_PEN, MF_BYCOMMAND);
+    case MODE_PENCIL:
+        CheckMenuRadioItem(hMenu, ID_SELECT, ID_PENCIL, ID_PENCIL, MF_BYCOMMAND);
         break;
     }
 }
@@ -4968,7 +4967,7 @@ extern HBITMAP g_hbm;
 enum MODE
 {
     MODE_SELECT,
-    MODE_DRAW
+    MODE_PENCIL
 };
 extern MODE g_nMode;
 
@@ -4992,7 +4991,6 @@ struct IMode
 ```cpp
 #include <windows.h>
 #include <windowsx.h>
-#include <strsafe.h>
 
 #define BM_MAGIC 0x4D42  /* 'BM' */
 
@@ -5274,7 +5272,7 @@ HGLOBAL DIBFromBitmap(HBITMAP hbm)
 ```cpp
 #include "paint.h"
 
-MODE g_nMode = MODE_DRAW;
+MODE g_nMode = MODE_PENCIL;
 static POINT s_pt;
 HBITMAP g_hbm = NULL;
 static BOOL s_bDragging = FALSE;
@@ -5445,7 +5443,7 @@ void DoSetMode(MODE nMode)
     case MODE_SELECT:
         s_pMode = new ModeSelect();
         break;
-    case MODE_DRAW:
+    case MODE_PENCIL:
         s_pMode = new ModeDraw();
         break;
     }
@@ -5608,8 +5606,8 @@ static void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SELECT:
         DoSetMode(MODE_SELECT);
         break;
-    case ID_PEN:
-        DoSetMode(MODE_DRAW);
+    case ID_PENCIL:
+        DoSetMode(MODE_PENCIL);
         break;
     }
 }
@@ -5903,7 +5901,7 @@ WinMain(HINSTANCE   hInstance,
 #define ID_DELETE                           106
 #define ID_SELECT_ALL                       107
 #define ID_SELECT                           108
-#define ID_PEN                              109
+#define ID_PENCIL                           109
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
@@ -5958,7 +5956,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
     POPUP "ツール(&T)"
     {
         MENUITEM "選択(&S)", ID_SELECT
-        MENUITEM "鉛筆(&P)", ID_PEN
+        MENUITEM "鉛筆(&P)", ID_PENCIL
     }
 }
 
